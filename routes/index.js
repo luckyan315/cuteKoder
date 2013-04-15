@@ -4,7 +4,7 @@
  */
 
 exports.index = function(req, res){
-  res.render('index', {title: 'Samsung Web SDK'});
+  res.render('index', {title: 'Home'});
 };
 
 exports.user = function(req, res){
