@@ -25,13 +25,13 @@ app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use(express.cookieParser());
-// app.use(express.session({
-//   secret: settings.cookieSecret,
-//   store: new MongoStore({
-//     db: settings.db
-//   })
-// }));
+app.use(express.cookieParser());
+app.use(express.session({
+  secret: settings.cookieSecret,
+  store: new MongoStore({
+    db: settings.db
+  })
+}));
 
 // development only
 if ('development' == app.get('env')) {
