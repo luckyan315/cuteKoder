@@ -26,24 +26,39 @@
 	  </a>
 	  <div class="nav-collapse">
 	    <ul class="nav">
-	      <li class="active"><a class="href="/"">Home</a></li>
-	      <li><a href="/login">Login</a></li>
+	      <li><a href="/">Home</a></li>
+	      <li class="active"><a href="/login">Login</a></li>
 	      <li><a href="/reg">Register</a></li>
 	    </ul>
 	  </div>
 	</div>
       </div>
     </div>
-    <div id="container" class="container">
-      <div class="hero-unit">
-	<h1>Welcome to CuteKoder </h1>
-	<p>Koding anywhere, anytime ...</p>
-	<p>
-	  <a class="btn btn-large btn-primary " href="/login">Login</a>
-	  <a class="btn btn-large" href="/reg">Register</a>
-	</p>
-      </div>
-      <hr />
+   <form class="form-horizontal" method="post" id="" action="">
+     <fieldset>
+       <legend>Login</legend>
+
+       <div class="control-group">
+	 <label class="control-label" for="username">Username</label>
+	 <div class="controls">
+	   <input type="text" class="input-xlarge" placeholder="e.g.: lucky315.an@gmail.com..." id="username" name="username" value="" />
+	 </div>
+       </div>
+
+       <div class="control-group">
+	 <label class="control-label" for="password">password</label>
+	 <div class="controls">
+	   <input type="password" class="input-large"id="password"  name="password" value="" />
+	 </div>
+       </div>
+
+       <div class="form-actions">
+	 <button type="submit" class="btn btn-xlarge btn-primary">Go</button>
+       </div>
+     </fieldset>
+   </form>
+    <!-- <hr /> -->
+    <div>
       <footer>
 	<p><a href="lucky315.an@gmail.com/" target="_blank">lucky315.an</a>2013</p>
       </footer>

@@ -29,19 +29,15 @@ exports.doReg = function(req, res){
 
 exports.login = function(req, res){
   // console.log('login');
-  res.render('ide', {title: 'ide'});
+  res.render('login', {title: 'login'});
 };
 
 exports.doLogin = function(req, res){
   console.log('doLogin');
+  res.render('ide', {title: 'ide'});
 };
 
 exports.logout = function(req, res){
   console.log('logout!');
 };
-
-
-
-
-
 
