@@ -13,7 +13,6 @@ var MongoStore = require('connect-mongo')(express);
 var settings = require('./settings');
 
 var app = express();
-
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
@@ -48,6 +47,25 @@ app.post('/login', routes.doLogin);
 app.get('/logout', routes.logout);
 app.get('/users', user.list);
 
-http.createServer(app).listen(app.get('port'), function(){
+var httpServer = http.createServer(app);
+
+
+//configure socket.io server
+var io = require('socket.io').listen(httpServer);
+var project = require('./project');
+io.sockets.on('connection', function(socket){
+  socket.on('loadfile', function(data){
+    // console.log(data);
+    project.loadfile(data['path']).on('success', function(data){
+      socket.emit('loadfile', data);
+    });
+
+    project.loadfile(data['path']).on('fail', function(data){
+      console.error(data);
+    });
+  });
+});
+
+httpServer.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
