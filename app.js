@@ -46,6 +46,9 @@ app.get('/login', routes.login);
 app.post('/login', routes.doLogin);
 app.get('/logout', routes.logout);
 app.get('/users', user.list);
+app.get('/apf', routes.apf);
+app.get('/test', routes.test);
+
 
 var httpServer = http.createServer(app);
 
@@ -54,7 +57,7 @@ var httpServer = http.createServer(app);
 var io = require('socket.io').listen(httpServer);
 var project = require('./project');
 io.sockets.on('connection', function(socket){
-  socket.on('loadfile', function(data){
+  socket.on('sdk-init', function(data){
     // console.log(data);
     project.loadfile(data['path']).on('success', function(data){
       socket.emit('loadfile', data);

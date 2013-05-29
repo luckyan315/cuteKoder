@@ -33,7 +33,7 @@ exports.loadfile = function(path){
                   if (err) return  console.error(err);
 
                   fs.stat(pathWalk, function(err, stats) {
-                    if (err) return  console.warn(err)
+                    if (err) return  console.warn(err);
 
                     if (stats.isFile()) {
                       fillEntries(pathWalk);

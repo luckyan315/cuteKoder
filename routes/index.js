@@ -41,3 +41,13 @@ exports.logout = function(req, res){
   console.log('logout!');
 };
 
+exports.apf = function(req, res){
+  // console.log('debug!');
+  res.sendfile('index.html');
+};
+
+
+exports.test = function(req, res){
+  // console.log('debug!');
+  res.sendfile('public/javascripts/apf/test/docs.html');
+};
