@@ -9,8 +9,8 @@ var express = require('express'),
     http = require('http'),
     path = require('path');
 
-var MongoStore = require('connect-mongo')(express);
-var settings = require('./settings');
+// var MongoStore = require('connect-mongo')(express);
+// var settings = require('./settings');
 
 var app = express();
 // all environments
@@ -21,6 +21,10 @@ app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
+
+app.use(express.cookieParser('cuteKoder'));
+app.use(express.session());
+
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 

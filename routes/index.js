@@ -1,5 +1,6 @@
 var crypto = require('crypto');
-var User = require('../models/user.js');
+// var User = require('../models/user.js');
+
 /*
  * GET home page.
  */
