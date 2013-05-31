@@ -16,7 +16,7 @@ var webSocketServer = new WsServer({
 
 webSocketServer.on('request', function(req){
   req.origin = req.origin || '*';
-  var websocket = require.accept(null, req.origin);
+  var websocket = req.accept(null, req.origin);
 
   websocket.on('message', function(msg){
     console.log('Recieved "' + msg.utf8Data + '" from' + req.origin);
