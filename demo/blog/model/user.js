@@ -30,31 +30,30 @@ exports = module.exports = User = function(user){
       });
     });
   };
+}).call(User.prototype);
 
-  this.get = function(name, cb){
-    mongodb.open(function(err, db){
+User.get = function(name, cb){
+  mongodb.open(function(err, db){
+    if( err ){
+      return cb(err);
+    }
+
+    db.collection('users', function(err, collection){
       if( err ){
+        mongodb.close();
         return cb(err);
       }
 
-      db.collection('users', function(err, collection){
-        if( err ){
-          mongodb.close();
-          return cb(err);
+      collection.findOne({name: name}, function(err, doc){
+        mongodb.close();
+        if( doc ){
+          var user = new User(doc);
+          cb(err, user); //if success, return user info
+        } else {
+          cb(err, null); //if fail, return null
         }
-
-        collection.findOne({name: name}, function(err, doc){
-          mongodb.close();
-          if( doc ){
-            var user = new User(doc);
-            cb(err, user); //if success, return user info
-          } else {
-            cb(err, null); //if fail, return null
-          }
-
-        });
       });
-
     });
-  }
-}).call(User.prototype);
+
+  });    
+};
