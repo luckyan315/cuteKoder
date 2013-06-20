@@ -62,7 +62,7 @@ function postReg(req, res){
     email: email
   });
 
-  newUser.get(newUser.name, function(err, user){
+  User.get(newUser.name, function(err, user){
     if( user ){
       err = 'User existed!';
     }
