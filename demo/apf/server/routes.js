@@ -17,7 +17,8 @@ app.get('/logout', sign.logout);
 
 app.get('/users', user.list);
 app.get('/apf', getApf);
-
+app.get('/dav', getWebdav);
+app.get('/hello', getHello);
 
 function getIndex(req, res){
   res.render('index', { title: 'Express' });
@@ -25,4 +26,12 @@ function getIndex(req, res){
 
 function getApf(req, res){
   res.sendfile(VIEWS_PATH + 'index.html');
+}
+
+function getWebdav(req, res){
+  res.sendfile(VIEWS_PATH + 'test_webdav.html');
+}
+
+function getHello(req, res){
+  res.sendfile(VIEWS_PATH + 'helloworld.html');
 }

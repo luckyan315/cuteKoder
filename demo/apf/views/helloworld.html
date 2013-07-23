@@ -1,17 +1,65 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns:a="http://ajax.org/2005/aml" xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <script src="apf_debug.js"></script>
-    </head>
-    <body style="display:none">
-        <a:skin 
-          src        = "skins/platform/skins.xml"
-          media-path = "skins/platform/images/" />
+  <head>
+    <script src="apf_debug.js"></script>
+  </head>
+  <body style="display:none">
+    <a:skin 
+       src        = "skins/platform/skins.xml"
+       media-path = "skins/platform/images/" />
 
-        <a:appsettings debug="true" resource-path="resources/" />
+    <a:appsettings debug="true" resource-path="resources/" />
 
-        <h1>Hello World</h1>
-	<p>1st Demo for apf</p>
-        <a:button caption="Click Me!" onclick="alert('Hello World!');" />
-    </body>
+    <h1>Hello World</h1>
+    <p>1st Demo for apf</p>
+    <a:button caption="Click Me!" onclick="alert('Hello World!');" />
+    <br />
+
+    <!-- <a:table columns="100, 100" cellheight="24"> -->
+    <!--   <a:label>Onclick event</a:label> -->
+    <!--   <a:button -->
+    <!-- 	 width   = "120" -->
+    <!-- 	 onclick = "alert('Button has been clicked')"> -->
+    <!--     Example button</a:button> -->
+    <!--   <a:label>Onmouseover event</a:label> -->
+    <!--   <a:button  -->
+    <!-- 	 width       = "120" -->
+    <!-- 	 onmouseover = "alert('Button has been hovered')"> -->
+    <!--     Example button</a:button> -->
+    <!--   <a:label>Onmouseout event</a:label> -->
+    <!--   <a:button  -->
+    <!-- 	 width      = "120" -->
+    <!-- 	 onmouseout = "alert('Mouse hover out button')"> -->
+    <!--     Example button</a:button> -->
+    <!-- </a:table> -->
+
+
+    <a:menu id="menu1">
+      <a:item>Tutorials</a:item>
+      <a:item icon="email.png">Contact</a:item>
+      <a:divider></a:divider>
+      <a:item 
+	 icon    = "application_view_icons.png"
+	 hotkey  = "Ctrl+T"
+	 onclick = "setTimeout(function(){alert('You did it');}, 1000)">
+	Tutorials</a:item>
+      <a:divider />
+      <a:item disabled="true">Visit Ajax.org</a:item>
+      <a:item>Exit</a:item>
+    </a:menu>
+    <a:window
+       width     = "400"
+       height    = "150"
+       visible   = "true"
+       resizable = "true"
+       title     = "Mail message"
+       icon      = "email.png">
+      <a:toolbar>
+        <a:menubar>
+          <a:button submenu="menu1">File</a:button>
+          <a:button submenu="menu1" disabled="true">Edit</a:button>
+        </a:menubar>
+      </a:toolbar>
+    </a:window>
+  </body>
 </html>

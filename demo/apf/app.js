@@ -1,4 +1,4 @@
-
+#!/usr/bin/env node
 /**
  * Module dependencies.
  */
@@ -8,9 +8,12 @@ var express = require('express')
   , path = require('path');
 
 var config = require('./config');
-var middleware = require('./server/middleware');
 var app = exports.app = express();
 var util = require('util');
+var middleware = require('./server/middleware');
+
+var server = exports.server = http.createServer(app);
+
 // all environments
 app.set('port', process.env.PORT || config.port || 3000);
 app.set('views', __dirname + '/views');
@@ -25,6 +28,7 @@ app.use(middleware.ideProvider());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'client')));
 app.use(express.static(path.join(__dirname, 'client/support/apf')));
+app.use(express.static(path.join(__dirname, 'client/support/demo')));
 
 // development only
 if ('development' == app.get('env')) {
@@ -37,7 +41,7 @@ if ('development' == app.get('env')) {
 
 require('./server/routes');
 
-exports.server = http.createServer(app).listen(app.get('port'), function(){
+server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
   util.puts(" \n\
 *****************************************************\n\
@@ -48,6 +52,9 @@ exports.server = http.createServer(app).listen(app.get('port'), function(){
 *****************************************************\n\
            \"" + config.name + " version " + config.version + '\"' + '\n');
 });
+
+// require('./server/sockets');
+// require('./server/jsdavs');
 
 /**
  * Handle exceptions
