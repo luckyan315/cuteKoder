@@ -11,9 +11,7 @@ term.on('data', function(data){
   console.log(data);
 });
 
-term.write('ls\r');
-term.resize(100, 40);
-term.write('ls /\r');
+term.write('pwd\r');
 
 console.log(term.process);
 
