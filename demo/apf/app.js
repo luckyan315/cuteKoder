@@ -3,9 +3,9 @@
  * Module dependencies.
  */
 
-var express = require('express')
-  , http = require('http')
-  , path = require('path');
+var express = require('express');
+var http = require('http');
+var path = require('path');
 
 var config = require('./config');
 var app = exports.app = express();

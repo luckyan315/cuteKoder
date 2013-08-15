@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:a="http://ajax.org/2005/aml" xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <script src="apf_debug_cloud9.js"></script>
+        <script src="apf_debug.js"></script>
         <!--script src="../../js/apf_release.js"></script-->
         <title>Content Viewer</title>
         <script type="text/javascript">
@@ -25,7 +25,9 @@
 	<a:hbox width="600" height="600" margin="5 0 0 0" >
             <a:tree id="$tree"
               model        = "mdlFs"
-		    multiselect = "true"
+              multiselect = "true"
+              autoselect="false"
+		    reselectable="true"
 	      startcollapsed = "false"
 	      contextmenu = "mnuEdit"
               width        = "400"
@@ -34,30 +36,29 @@
                 var node = this.selected;
                 if (node.tagName != 'file')
                     return;
-                apf.getData('{myWebDAV.read([@path])}', {
+                apf.getData('{myWebDAV.read([@id])}', {
                     xmlNode : node,
                     callback: loadData
                 });">
-                <a:bindings>
-                    <a:insert match="[node()[@type='folder']]" get="{myWebDAV.readdir([@path])}" />
+
+              <a:insert match="[node()[@type='folder']]" get="{myWebDAV.readdir([@id])}" />
                     <a:each match="[file|folder]" sort="[@name]" sort-method="filesort" />
                     <a:caption match="[@name]" />
                     <a:icon match="[folder]" value="Famfolder.gif" />
                     <a:icon match="[file]" value="{getIcon(%[.])}" />
                     <a:actions>
-                       <a:add type="folder" get="{myWebDAV.mkdir([@path], 'New Folder')}" />
-                       <a:add type="file" get="{myWebDAV.create([@path], 'New File.txt', '')}" />
-                       <a:rename set="{myWebDAV.rename([@name], [@path])}"/>
-                       <a:copy match="[.]" set="{myWebDAV.copy([@path], [../@path])}"/>
-                       <a:move match="[.]" set="{myWebDAV.move([@path], [../@path])}"/>
-                       <a:remove match="[.]" set="{myWebDAV.remove([@path])}"/>
+                       <a:add type="folder" get="{myWebDAV.mkdir([@id], 'New Folder')}" />
+                       <a:add type="file" get="{myWebDAV.create([@id], 'New File.txt', '')}" />
+                       <a:rename set="{myWebDAV.rename([@name], [@id])}"/>
+                       <a:copy match="[file|folder]" set="{myWebDAV.copy([@id], [../@id])}"/>
+                       <a:move match="[file|folder]" set="{myWebDAV.move([@id], [../@id])}"/>
+                       <a:remove match="[file|folder]" set="{myWebDAV.remove([@id])}"/>
                     </a:actions>
-                    <!--a:dragdrop>
-                        <a:allow-drag match="folder|file" />
-                        <a:allow-drop match="folder|file" target="folder"
-                            operation="tree-append" copy-condition="event.ctrlKey" />
-                    </a:dragdrop-->
-                </a:bindings>
+		    
+                    <a:drag match="[folder|file]" />
+                    <a:drop match="[folder|file]" target="[folder]"
+                            action="tree-append" copy="event.ctrlKey" />
+
             </a:tree>
 
             <a:textarea id="txtView" width="300" model="mdlFileContents" value="[.]" onafterchange="mdlFileContents.submit()" />
@@ -70,6 +71,11 @@
 	  <a:item onclick="apf.activeElement.remove()">Remove</a:item>
 	  <a:divider ></a:divider>
 	  <a:item onclick="apf.activeElement.selectAll()">Select All</a:item>
+	  <a:divider ></a:divider>
+	  <a:item onclick="apf.activeElement.add()">New Folder</a:item>
+	  <a:item onclick="apf.activeElement.add()">New File</a:item>
+
+
 	</a:menu>
 
         <a:script><![CDATA[

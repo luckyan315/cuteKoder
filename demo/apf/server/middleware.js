@@ -18,6 +18,6 @@ exports.ideProvider = function(){
   var ide = new WebIde(httpServer);
 
   return function(req, res, next){
-    next();
+    ide.handle(req, res, next);
   };  
 };
