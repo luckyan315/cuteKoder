@@ -1,16 +1,17 @@
-
+***  tag
+     1. JSON.parse --> try catch
+     2.
+       
 * TODO Functions to impl
+   2. User datebase management
+   3. file/dir watcher (vfs) 
+   4. jsDAV funcs 
+     - search file 
+     - replace file content 
+     - regexp support 
+   5. Impl simple virtual terminal
+   6. pty permission (ssh login by terminal)
 
-*** 1. express http request hook the url --> jsdav server
-    2. filter all request from client side.
-    3. ejs render, permission...
-    4. file/dir watcher (vfs)
-    5. file/workspace api change to using vfs api
-    6. jsDAV funcs
-      - search file
-      - replace file content
-      - regexp support 
-    7. Impl simple virtual terminal
 
 * TODO Advice by client
   1. webdav url may not need user id(nickname)
@@ -29,9 +30,20 @@
      - node-gyp configure
      - node-gyp build
      - node-v0.6.16 ./test.js  (see the result success!), but not in cur node(v0.10.13)
+  3. 
 
 
 * DONE Functions implemented
   1. socket.io plugin system for server side
   2. import pty.js
-     
+  3. filter all request from client side.
+     - http : app.router (permission OK)
+     - webdav : davServer.exec (permission OK)
+     - websocket : socket.io (permission OK)
+
+  4. express http request hook the url --> jsdav server
+
+  5. file/workspace api change to using vfs api 
+
+  6. use ejs render client side dynamicly
+

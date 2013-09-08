@@ -8,12 +8,12 @@ var util = require('util');
 
 exports = module.exports = WebIde = function(server){
   EventEmitter.call(this);
-  this.httpServer = server;
+  this.$httpServer = server;
 
   var davOptions = {
     node: __dirname + '/../assets',
     mount: '/workspace',
-    server: this.httpServer,
+    server: this.$httpServer,
     plugins: [jsDAV_Browser_Plugin],
     standalone: false
   };
@@ -21,7 +21,7 @@ exports = module.exports = WebIde = function(server){
   jsDAV.debugMode = true;
   davOptions.tree = new jsDAV_Tree_Filesystem(vfs, davOptions.node);
   
-  this.davServer = jsDAV.mount(davOptions);
+  this.$davServer = jsDAV.mount(davOptions);
 
   console.log('jsDAV server mount at: ' + davOptions.node);
 
@@ -38,7 +38,7 @@ util.inherits(WebIde, EventEmitter);
     var workspaceReg =  new RegExp('^/workspace');
 
     if( path.match(workspaceReg) ){
-      this.davServer.exec(req, res);
+      this.$davServer.exec(req, res);
     } else {
       next();
     }
