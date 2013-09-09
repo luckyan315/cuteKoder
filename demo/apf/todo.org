@@ -1,7 +1,9 @@
 ***  tag
-     1. JSON.parse --> try catch
-     2. 
-       
+     1. Project database dao
+     2. Terminal impls
+     3. JSON.parse --> try catch
+
+
 * TODO Functions to impl
    1. User,Project datebase management
    2. file/dir watcher (vfs) 
