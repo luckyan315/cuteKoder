@@ -1,16 +1,17 @@
 ***  tag
      1. JSON.parse --> try catch
-     2.
+     2. 
        
 * TODO Functions to impl
-   2. User datebase management
-   3. file/dir watcher (vfs) 
-   4. jsDAV funcs 
+   1. User,Project datebase management
+   2. file/dir watcher (vfs) 
+   3. jsDAV funcs 
      - search file 
      - replace file content 
      - regexp support 
-   5. Impl simple virtual terminal
-   6. pty permission (ssh login by terminal)
+   4. Impl simple virtual terminal
+   5. pty permission (ssh login by terminal)
+   6. _csrf checking via express
 
 
 * TODO Advice by client
