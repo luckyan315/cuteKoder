@@ -1,18 +1,3 @@
-/**
- *@file      terminal
- *@brief     pseudo terminal
- *@author    angl( guanglin.an@samsung.com), SCRC-SL
- *@date      Fri Sep  6 11:28:47 2013
- *
- * Copyright 2013 by Samsung Electronics, Inc.,
- *
- * This software is the confidential and proprietary information 
- * of Samsung Electronics, Inc. ("Confidential Information").  You
- * shall not disclose such Confidential Information and shall use
- * it only in accordance with the terms of the license agreement
- * you entered into with Samsung.
- */
-
 "use strict";
 
 var socket = io.connect('http://localhost:3000');
