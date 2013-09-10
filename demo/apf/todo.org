@@ -5,6 +5,7 @@
      4. server load lang, ace , apf...
      5. unity error handling (http status code)
      6. ejs template page
+     7. log system for tracing user's behaviour
 
 * TODO Functions to impl
    1. User,Project datebase management
