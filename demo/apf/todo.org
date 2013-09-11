@@ -1,11 +1,11 @@
 ***  tag
-     1. Project database dao
-     2. Terminal impls
-     3. JSON.parse --> try catch
-     4. server load lang, ace , apf...
-     5. unity error handling (http status code)
-     6. ejs template page
-     7. log system for tracing user's behaviour
+     1. Terminal impls
+     2. JSON.parse --> try catch
+     3. server load lang, ace , apf...
+     4. unity error handling (http status code)
+     5. template for ejs page
+     6. log system for tracing user's behaviour
+     7. recent active projects , make date format friendly
 
 * TODO Functions to impl
    1. User,Project datebase management
@@ -52,4 +52,5 @@
   5. file/workspace api change to using vfs api 
 
   6. use ejs render client side dynamicly
+  7. Project database dao
 
