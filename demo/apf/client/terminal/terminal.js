@@ -1,6 +1,5 @@
 "use strict";
 
-
 function main(){
     var term = new Terminal();
     var socket = io.connect('http://localhost:3000');
@@ -134,13 +133,16 @@ inherits(Terminal, EventEmitter);
 
 
 //state of ANSI escape code, REF://http://en.wikipedia.org/wiki/ANSI_escape_code
-Terminal.COMMON = 1; //command charset
-Terminal.ESC = 2; //ESC
+Terminal.COMMON = 0; //command charset
+Terminal.ESC = 1; //ESC
+Terminal.CSI = 2; //ESC [, CSI
+
 //Select a single character from one of the alternate character sets.
 Terminal.SS2 = 3; //ESC N, 
 Terminal.SS3 = 4; //ESC O, 
-//These each take a single string of text, terminated by ST (ESC \ ). They are ignored by xterm.
+//Privacy Message
 Terminal.PM = 5;  //ESC ^,
+//Application Program Command
 Terminal.APC = 6; //ESC _,
 //Device control string
 Terminal.DCS = 7; //ESC P,
@@ -164,6 +166,9 @@ Terminal.COL = 80;
 
 	//init vars
 	var content = data;
+	var c = this.$cursor.x;
+	var r = this.$cursor.y;
+	
 	this.$parse_state = this.$parse_state || Terminal.COMMON
 	
 	for(var i=0; i<content.length; i++){
@@ -175,18 +180,59 @@ Terminal.COL = 80;
 		    this.$parse_state = Terminal.ESC;
 		    break;
 		case '\n':
-		    this.$cursor.y += 1;
+		    r++;
 		    break;
 		case '\r':
-		    this.$cursor.x = 0
+		    c = 0
 		    break;
+		case '\b':
+		    c--;
 		default:
-		    
+		    this.$rows[r][c] = ch;
+		    c++;
+		    break;
 		};
 
 		break;
 	    case Terminal.ESC:
+		switch(ch){
+		case '[':
+		    this.$parse_state = Terminal.CSI;
+		    alert('CSI detacted!');
+		    break;
+		case 'N':
+		    //TODO: ESC N
+		    this.$parse_state = Terminal.SS2;
+		    break;
+		case 'O':
+		    //TODO: ESC O
+		    this.$parse_state = Terminal.SS3;
+
+		    break;
+		case '^':
+		    //TODO: ESC ^
+		    this.$parse_state = Terminal.PM;
+		    break;
+		case '_':
+		    //TODO: ESC _
+		    this.$parse_state = Terminal.APC;
+		    break;
+		case 'P':
+		    //TODO: ESC P
+		    this.$parse_state = Terminal.DCS;
+		    break;
+		case ']':
+		    //TODO: ESC ]
+		    this.$parse_state = Terminal.OSC;
+		    break;
+		default:
+		    //
+		};
+
 		break;
+	    case Terminal.SCI:
+		break;
+
 	    case Terminal.SS2:
 		break;
 	    case Terminal.SS3:
@@ -198,6 +244,7 @@ Terminal.COL = 80;
 	    case Terminal.DCS:
 		break;
 	    case Terminal.OSC:
+		
 		break;
 		
 	    }

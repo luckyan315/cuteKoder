@@ -6,6 +6,11 @@
      5. template for ejs page
      6. log system for tracing user's behaviour
      7. recent active projects , make date format friendly
+     8. provide query style APIs 
+
+*** idea
+   1. voc floating box, easy way to get the voc
+   2. 
 
 * TODO Functions to impl
    1. User,Project datebase management
