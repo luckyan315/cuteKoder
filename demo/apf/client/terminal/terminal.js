@@ -12,34 +12,45 @@ function main(){
 
     //data from user inputted via terminal
     term.on('message', function(data){
-	socket.send(JSON.stringify({msg: data, command: 'shell'}));
+	// socket.send(JSON.stringify({msg: data, command: 'shell'}));
+	socket.emit('data', data);
     });
     
     term.draw();
-    
+
 }
 
 
-function Terminal(container, row, col){
+function Terminal(container, r, c){
     EventEmitter.call(this);
     
     this.$container = container | document.body;
     this.$root = null;
     this.document = document;
     
-    this.$row = row | Terminal.ROW;
-    this.$col = col | Terminal.COL;
+    this.$nRow = r | Terminal.ROW;
+    this.$nCol = c | Terminal.COL;
 
-    /* row divs */
+    /* char content to be rendered */
     this.$rows = [];
+    for(var i=0; i<this.$nRow; i++){
+	var r = []; //row
+	for(var j=0; j<this.$nCol; j++){
+	    r[j] = ' ';
+	}
+	this.$rows.push(r);
+    }
+    
     /* line nums received from server */
     this.$curline = 0;
-
+    
     /* coordinate of the cursor */
     this.$cursor = {
 	x: 0,
 	y: 0
     };
+
+    this.$parse_state = Terminal.COMMON;
     
     var _this = this;
     
@@ -105,9 +116,9 @@ function Terminal(container, row, col){
 	    
 	default:
 	    if( e.ctrlKey ){
-		  if (e.keyCode >= 65 && e.keyCode <= 90) {
-		      ch = String.fromCharCode(e.keyCode - 64);
-		  }
+		if (e.keyCode >= 65 && e.keyCode <= 90) {
+		    ch = String.fromCharCode(e.keyCode - 64);
+		}
 	    }
 
 	}
@@ -121,9 +132,25 @@ function Terminal(container, row, col){
 
 inherits(Terminal, EventEmitter);
 
+
+//state of ANSI escape code, REF://http://en.wikipedia.org/wiki/ANSI_escape_code
+Terminal.COMMON = 1; //command charset
+Terminal.ESC = 2; //ESC
+//Select a single character from one of the alternate character sets.
+Terminal.SS2 = 3; //ESC N, 
+Terminal.SS3 = 4; //ESC O, 
+//These each take a single string of text, terminated by ST (ESC \ ). They are ignored by xterm.
+Terminal.PM = 5;  //ESC ^,
+Terminal.APC = 6; //ESC _,
+//Device control string
+Terminal.DCS = 7; //ESC P,
+//operating system command
+Terminal.OSC = 8; //ESC ], 
+
 //default size of pty
-Terminal.ROW = 80;
-Terminal.COL = 24;
+Terminal.ROW = 24;
+Terminal.COL = 80;
+
 
 (function(){
 
@@ -133,24 +160,60 @@ Terminal.COL = 24;
     //public
     
     this.handleMessage = function(data){
-	console.log('[Terminal]' + data);
-	
-	var content = data;
+	console.log('[Terminal]' + data.replace(/\x1b/g, '^['));
 
+	//init vars
+	var content = data;
+	this.$parse_state = this.$parse_state || Terminal.COMMON
+	
 	for(var i=0; i<content.length; i++){
 	    var ch = content[i];
-	    switch(ch){
-	    case '\r':
-		ch = '';
+	    switch(this.$parse_state){
+	    case Terminal.COMMON:
+		switch(ch){
+		case '\x001b':
+		    this.$parse_state = Terminal.ESC;
+		    break;
+		case '\n':
+		    this.$cursor.y += 1;
+		    break;
+		case '\r':
+		    this.$cursor.x = 0
+		    break;
+		default:
+		    
+		};
+
 		break;
-	    case '\n':
-		this.$curline++;
-		this.$cursor.y++;
-		ch='';
+	    case Terminal.ESC:
 		break;
+	    case Terminal.SS2:
+		break;
+	    case Terminal.SS3:
+		break;
+	    case Terminal.PM:
+		break;
+	    case Terminal.APC:
+		break;
+	    case Terminal.DCS:
+		break;
+	    case Terminal.OSC:
+		break;
+		
 	    }
 	    
-	    this.$rows[this.$curline].innerHTML += ch;
+	    // switch(ch){
+	    // case '\r':
+	    // 	ch = '';
+	    // 	break;
+	    // case '\n':
+	    // 	this.$curline++;
+	    // 	this.$cursor.y++;
+	    // 	ch='';
+	    // 	break;
+	    // }
+	    
+	    // this.$rows[this.$curline].innerHTML += ch;
 	}
 	
     };
@@ -163,7 +226,7 @@ Terminal.COL = 24;
 	for(var i = 0; i < this.$row; i++) {
 	    oRowDiv = this.document.createElement('div');
 	    this.$root.appendChild(oRowDiv);
-	    this.$rows.push(oRowDiv);
+	    // this.$rows.push(oRowDiv);
 	}
 
 	if( this.$container == false){
@@ -179,7 +242,7 @@ Terminal.COL = 24;
 
 }).call(Terminal.prototype);
 
-//EventEmitter
+//EventEmitter , node.js style api
 function EventEmitter(){
     this.$events = {};
 }
@@ -278,6 +341,15 @@ function stopBubbling(e){
 	e.cancelBubble = true;
     }
 }
+
+function getStyle(element, attr_name){
+    if( element.currentStyle ){
+	return element.currentStyle[attr_name];
+    } else {
+	return getComputedStyle(element, false)[attr_name];
+    }
+}
+
 
 Terminal.keyNames = {3: "Enter", 8: "Backspace", 9: "Tab", 13: "Enter", 16: "Shift", 17: "Ctrl", 18: "Alt",
                      19: "Pause", 20: "CapsLock", 27: "Esc", 32: "Space", 33: "PageUp", 34: "PageDown", 35: "End",
