@@ -4,15 +4,15 @@ function main(){
     var term = new Terminal();
     var socket = io.connect('http://localhost:3000');
 
-    //data from server
+    //data recv from server
     socket.on('data', function(data){
 	term.handleMessage(data);
     });
 
-    //data from user inputted via terminal
-    term.on('message', function(data){
-	// socket.send(JSON.stringify({msg: data, command: 'shell'}));
-	socket.emit('data', data);
+    //data send to server
+    term.on('data', function(data){
+	socket.send(JSON.stringify({msg: data, command: 'shell'}));
+	// socket.emit('data', data);
     });
     
     term.draw();
@@ -49,6 +49,10 @@ function Terminal(container, r, c){
 	y: 0
     };
 
+    /* save parameters as parsing csi sequence */
+    this.$csiParams = [];
+    this.$curParam = 0;
+    
     this.$parse_state = Terminal.COMMON;
     
     var _this = this;
@@ -131,8 +135,14 @@ function Terminal(container, r, c){
 
 inherits(Terminal, EventEmitter);
 
-
-//state of ANSI escape code, REF://http://en.wikipedia.org/wiki/ANSI_escape_code
+/**
+ * state of ANSI escape code,
+ *
+ * REF:
+ *      http://en.wikipedia.org/wiki/ANSI_escape_code
+ *      http://en.wikipedia.org/wiki/C0_and_C1_control_codes
+ *      http://en.wikipedia.org/wiki/Control_Sequence_Introducer#Sequence_elements
+ */
 Terminal.COMMON = 0; //command charset
 Terminal.ESC = 1; //ESC
 Terminal.CSI = 2; //ESC [, CSI
@@ -169,14 +179,15 @@ Terminal.COL = 80;
 	var c = this.$cursor.x;
 	var r = this.$cursor.y;
 	
-	this.$parse_state = this.$parse_state || Terminal.COMMON
+	this.$parse_state = this.$parse_state || Terminal.COMMON;
 	
 	for(var i=0; i<content.length; i++){
 	    var ch = content[i];
+
 	    switch(this.$parse_state){
 	    case Terminal.COMMON:
 		switch(ch){
-		case '\x001b':
+		case '\x1b':
 		    this.$parse_state = Terminal.ESC;
 		    break;
 		case '\n':
@@ -190,15 +201,12 @@ Terminal.COL = 80;
 		default:
 		    this.$rows[r][c] = ch;
 		    c++;
-		    break;
 		};
-
-		break;
+		break; /* Terminal.COMMON */
 	    case Terminal.ESC:
 		switch(ch){
 		case '[':
 		    this.$parse_state = Terminal.CSI;
-		    alert('CSI detacted!');
 		    break;
 		case 'N':
 		    //TODO: ESC N
@@ -225,14 +233,53 @@ Terminal.COL = 80;
 		    //TODO: ESC ]
 		    this.$parse_state = Terminal.OSC;
 		    break;
+		case '\x07':
+		    //bell
+		    
+		    break;
 		default:
 		    //
+		    throw new Error('Unkown PARSE_STATE:' + ch); 
+		    break;
 		};
 
-		break;
-	    case Terminal.SCI:
-		break;
+		break; /* Terminal.ESC */
+	    case Terminal.CSI:
+		console.log('[BrowserIDE] CSI detacted!');
+		
+		switch(ch){
+		case '0':/* 48 */
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+		    //a digit
+		    this.$curParam = this.$curParam * 10 + ch.charCodeAt(0) - 48;
+		    break;
+		case '?':
+		    //TODO: csi ?
+		    break;
+		case '>':
+		    //TODO: csi >
+		    break;
+		case '$':
+		    //TODO: csi $
+		    break;
+		case '\'':
+		    //TODO: csi \
+		    break;
+		case ';':
+		    //TODO: csi ;
+		    break;
+		    
+		}
 
+		break; /* Terminal.CSI */
 	    case Terminal.SS2:
 		break;
 	    case Terminal.SS3:
@@ -246,7 +293,8 @@ Terminal.COL = 80;
 	    case Terminal.OSC:
 		
 		break;
-		
+	    default:
+
 	    }
 	    
 	    // switch(ch){
@@ -284,7 +332,7 @@ Terminal.COL = 80;
 
     //send data to server
     this.send = function(data){
-	this.emit('message', data);
+	this.emit('data', data);
     };
 
 }).call(Terminal.prototype);
@@ -397,6 +445,9 @@ function getStyle(element, attr_name){
     }
 }
 
+function isDigit(ch){
+    return ch >= '0' && ch <= '9';
+}
 
 Terminal.keyNames = {3: "Enter", 8: "Backspace", 9: "Tab", 13: "Enter", 16: "Shift", 17: "Ctrl", 18: "Alt",
                      19: "Pause", 20: "CapsLock", 27: "Esc", 32: "Space", 33: "PageUp", 34: "PageDown", 35: "End",
