@@ -275,8 +275,80 @@ Terminal.COL = 80;
 		    break;
 		case ';':
 		    //TODO: csi ;
+                    this.$csiParams.push(this.$curParam);
+		    this.$curParam = 0;
 		    break;
+		case 'A': 
+		    //CUU, Moves cursor up Ps lines in the same column. 
+		    break;
+		case 'B':
+		    //Moves cursor down Ps lines in the same column. 
+		    break;
+		case 'C':
+		    //Moves cursor to the right Ps columns. 
+		    break;
+		case 'D':
+		    //Moves cursor to the left Ps columns. 
+		    break;
+		case 'E':
+		    //Moves cursor to the first column of Ps-th following line. 
+		    break;
+		case 'F':
+		    //Moves cursor to the first column of Ps-th preceding line. 
+		    break;
+		case 'G':
+		    //Moves cursor to the Ps-th column of the active line. 
+		    break;
+		case 'H':
+		    //Moves cursor to the Ps1-th line and to the Ps2-th column. 
+		    break;
+		case 'I':
+		    //Moves cursor to the Ps tabs forward. 
+		    break;
+		case 'J':
+		    //Erase in display. The default value of Ps is 0.
+		    //Ps = 0      Erase from cursor through the end of the display.
+		    //   = 1      Erase from the beginning of the display through the cursor.
+		    //   = 2      Erase the complete of display.
+		    break;
+		case 'K':
+		    //Erase in line. The default value of Ps is 0.
+		    // Ps = 0      Erase from the cursor through the end of the line.
+		    //    = 1      Erase from the beginning of the line through the cursor.
+		    //    = 2      Erase the complete of line.
 		    
+		    break;
+		case 'L':
+		    //Inserts Ps lines, stgarting at the cursor. The default 1. 
+		    break;
+		case 'M':
+		    //Deletes Ps lines in the scrolling region, starting with the line
+		    //that has the cursor, the default 1.
+		    break;
+		case 'P':
+		    //Deletes Ps characters from the cursor position to the right.The default 1.
+		    break;
+		case 'S':
+		    //Scroll up Ps lines. The default 1.
+		    break;
+		case 'T':
+		    //Scroll down Ps lines. The default value of Ps is 1.
+		    break;
+		case 'X':
+		    //Erase Ps characters, from the cursor positioon to the right.The default 1.
+		    break;
+		case 'Z':
+		    //Moves cursor to the Ps tabs backward.The default 1.
+		    break;
+		case '\'': //single quote
+		    //Moves cursor to the Ps-th columns of the active line. The default 1.
+		    break;
+		case 'a':
+		    //Moves cursor to the right Ps columns.The default 1.
+		    break;
+		case 'c':
+		    //
+		    break;
 		}
 
 		break; /* Terminal.CSI */
