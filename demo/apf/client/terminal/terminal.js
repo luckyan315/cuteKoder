@@ -1,98 +1,105 @@
 /**
- *  Mode(Strandard)
+ * terminal.js - a browser pseudo terminal 
+ * Copyright (c) 2013, guanglin.an (lucky315.an@gmail.com)
  */
-// | Mode No. | Mnemoni  | Set(DECSET)                                   | Reset(DECRST)                |
-// |        2 | KAM      | Locks the keyboard                            | Unlonks the keyboard         |
-// |----------+----------+-----------------------------------------------+------------------------------|
-// |        4 | IRM      | Insert mode                                   | Replace mode                 |
-// |----------+----------+-----------------------------------------------+------------------------------|
-// |       12 | SRM      | Local echo off                                | Local echo on                |
-// |----------+----------+-----------------------------------------------+------------------------------|
-// |       20 | LNM      | New line mode.                                |                              |
-// |          |          | -Cursor moves to the first column of the next | Line feed mode               |
-// |          |          | line when the terminal receives an LF, FF or  | -Cursor moves to current     |
-// |          |          | VT character.                                 | column on the next line      |
-// |          |          | -New-line(Transmit)settting is changed to     | when the terminal receives   |
-// |          |          | "CR+LF"                                       | an LF, FF or VT character.   |
-// |          |          |                                               | - New-line(Transmit) setting |
-// |          |          |                                               | is changed to "CR"           |
-// |----------+----------+-----------------------------------------------+------------------------------|
-// |       33 | WYSTCURM | Steady cursor                                 | Blinking cursor.             |
-// |----------+----------+-----------------------------------------------+------------------------------|
-// |       34 | WYULCURM | Underline cursor                              | Block cursor                 |
-// |----------+----------+-----------------------------------------------+------------------------------|
+
+/**
+ *  Mode(Strandard)
+ *
+ * | Mode No. | Mnemoni  | Set(DECSET)                                   | Reset(DECRST)                |
+ * |        2 | KAM      | Locks the keyboard                            | Unlonks the keyboard         |
+ * |----------+----------+-----------------------------------------------+------------------------------|
+ * |        4 | IRM      | Insert mode                                   | Replace mode                 |
+ * |----------+----------+-----------------------------------------------+------------------------------|
+ * |       12 | SRM      | Local echo off                                | Local echo on                |
+ * |----------+----------+-----------------------------------------------+------------------------------|
+ * |       20 | LNM      | New line mode.                                |                              |
+ * |          |          | -Cursor moves to the first column of the next | Line feed mode               |
+ * |          |          | line when the terminal receives an LF, FF or  | -Cursor moves to current     |
+ * |          |          | VT character.                                 | column on the next line      |
+ * |          |          | -New-line(Transmit)settting is changed to     | when the terminal receives   |
+ * |          |          | "CR+LF"                                       | an LF, FF or VT character.   |
+ * |          |          |                                               | - New-line(Transmit) setting |
+ * |          |          |                                               | is changed to "CR"           |
+ * |----------+----------+-----------------------------------------------+------------------------------|
+ * |       33 | WYSTCURM | Steady cursor                                 | Blinking cursor.             |
+ * |----------+----------+-----------------------------------------------+------------------------------|
+ * |       34 | WYULCURM | Underline cursor                              | Block cursor                 |
+ * |----------+----------+-----------------------------------------------+------------------------------|
+ */
 
 /**
  *  Character Atrributes.(SGR)
+ *
+ * |--------------------+----------------------------------------------------------------------------------|
+ * |                No. | Attribute                                                                        |
+ * |--------------------+----------------------------------------------------------------------------------|
+ * |                  0 | Normal                                                                           |
+ * |                  1 | Bold                                                                             |
+ * |                  4 | Underlined                                                                       |
+ * |                  5 | Blink                                                                            |
+ * |                  7 | Inverse                                                                          |
+ * |                 22 | Normal(heighter bold nor faint)                                                  |
+ * |                 24 | Not underlined                                                                   |
+ * |                 25 | Steady(not blinking)                                                             |
+ * |                 27 | Positive(not inverse)                                                            |
+ * |                 30 | Set foreground color to Black.                                                   |
+ * |                 31 | Set foreground color to Red.                                                     |
+ * |                 32 | Set foreground color to Green.                                                   |
+ * |                 33 | Set foreground color to Yellow.                                                  |
+ * |                 34 | Set foreground color to Blue                                                     |
+ * |                 35 | Set foreground color to Magenta                                                  |
+ * |                 36 | Set foreground color to Cyan                                                     |
+ * |                 37 | Set foreground color to White                                                    |
+ * |--------------------+----------------------------------------------------------------------------------|
+ * | 38 ; 2 ; r ; g ; b |                                                                                  |
+ * | 38 ; 2 ; r : g : b |                                                                                  |
+ * | 38 ; 2 : r : g : b |                                                                                  |
+ * | 38 : 2 : r : g : b | Set foreground color in RGB value, matching closest entry in 256 colors palette. |
+ * |--------------------+----------------------------------------------------------------------------------|
+ * |        38 ; 5 ; Ps |                                                                                  |
+ * |        38 ; 5 : Ps |                                                                                  |
+ * |        38 : 5 : Ps | Set foreground color to color number Ps.                                         |
+ * |--------------------+----------------------------------------------------------------------------------|
+ * |                    |                                                                                  |
+ * |                 39 | Set foreground color to default.                                                 |
+ * |                 40 | Set background color to Black. (Color No. 0)                                     |
+ * |                 41 | Set background color to Red. (Color No. 1)                                       |
+ * |                 42 | Set background color to Green. (Color No. 2)                                     |
+ * |                 43 | Set background color to Yellow. (Color No. 3)                                    |
+ * |                 44 | Set background color to Blue. (Color No. 4)                                      |
+ * |                 45 | Set background color to Magenta. (Color No. 5)                                   |
+ * |                 46 | Set background color to Cyan. (Color No. 6)                                      |
+ * |                 47 | Set background color to White. (Color No. 7)                                     |
+ * |--------------------+----------------------------------------------------------------------------------|
+ * | 48 ; 2 ; r ; g ; b |                                                                                  |
+ * | 48 ; 2 ; r : g : b |                                                                                  |
+ * | 48 ; 2 : r : g : b |                                                                                  |
+ * | 48 : 2 : r : g : b | Set background color in RGB value, matching closest entry in 256 colors palette. |
+ * |--------------------+----------------------------------------------------------------------------------|
+ * |        48 ; 5 ; Ps |                                                                                  |
+ * |        48 ; 5 : Ps |                                                                                  |
+ * |        48 : 5 : Ps | Set background color to color number Ps.                                         |
+ * |--------------------+----------------------------------------------------------------------------------|
+ * |                 49 | Set background color to default.                                                 |
+ * |                 90 | Set foreground color to Gray. (Color No. 8)                                      |
+ * |                 91 | Set foreground color to Bright Red. (Color No. 9)                                |
+ * |                 92 | Set foreground color to Bright Green. (Color No. 10)                             |
+ * |                 93 | Set foreground color to Bright Yellow. (Color No. 11)                            |
+ * |                 94 | Set foreground color to Bright Blue. (Color No. 12)                              |
+ * |                 95 | Set foreground color to Bright Magenta. (Color No. 13)                           |
+ * |                 96 | Set foreground color to Bright Cyan. (Color No. 14)                              |
+ * |                 97 | Set foreground color to Bright White. (Color No. 15)                             |
+ * |                100 | Set background color to Gray. (Color No. 8)                                      |
+ * |                101 | Set background color to Bright Red. (Color No. 9)                                |
+ * |                102 | Set background color to Bright Green. (Color No. 10)                             |
+ * |                103 | Set background color to Bright Yellow. (Color No. 11)                            |
+ * |                104 | Set background color to Bright Blue. (Color No. 12)                              |
+ * |                105 | Set background color to Bright Magenta. (Color No. 13)                           |
+ * |                106 | Set background color to Bright Cyan. (Color No. 14)                              |
+ * |                107 | Set background color to Bright White. (Color No. 15)                             |
+ * |--------------------+----------------------------------------------------------------------------------|
  */
-// |--------------------+----------------------------------------------------------------------------------|
-// |                No. | Attribute                                                                        |
-// |--------------------+----------------------------------------------------------------------------------|
-// |                  0 | Normal                                                                           |
-// |                  1 | Bold                                                                             |
-// |                  4 | Underlined                                                                       |
-// |                  5 | Blink                                                                            |
-// |                  7 | Inverse                                                                          |
-// |                 22 | Normal(heighter bold nor faint)                                                  |
-// |                 24 | Not underlined                                                                   |
-// |                 25 | Steady(not blinking)                                                             |
-// |                 27 | Positive(not inverse)                                                            |
-// |                 30 | Set foreground color to Black.                                                   |
-// |                 31 | Set foreground color to Red.                                                     |
-// |                 32 | Set foreground color to Green.                                                   |
-// |                 33 | Set foreground color to Yellow.                                                  |
-// |                 34 | Set foreground color to Blue                                                     |
-// |                 35 | Set foreground color to Magenta                                                  |
-// |                 36 | Set foreground color to Cyan                                                     |
-// |                 37 | Set foreground color to White                                                    |
-// |--------------------+----------------------------------------------------------------------------------|
-// | 38 ; 2 ; r ; g ; b |                                                                                  |
-// | 38 ; 2 ; r : g : b |                                                                                  |
-// | 38 ; 2 : r : g : b |                                                                                  |
-// | 38 : 2 : r : g : b | Set foreground color in RGB value, matching closest entry in 256 colors palette. |
-// |--------------------+----------------------------------------------------------------------------------|
-// |        38 ; 5 ; Ps |                                                                                  |
-// |        38 ; 5 : Ps |                                                                                  |
-// |        38 : 5 : Ps | Set foreground color to color number Ps.                                         |
-// |--------------------+----------------------------------------------------------------------------------|
-// |                    |                                                                                  |
-// |                 39 | Set foreground color to default.                                                 |
-// |                 40 | Set background color to Black. (Color No. 0)                                     |
-// |                 41 | Set background color to Red. (Color No. 1)                                       |
-// |                 42 | Set background color to Green. (Color No. 2)                                     |
-// |                 43 | Set background color to Yellow. (Color No. 3)                                    |
-// |                 44 | Set background color to Blue. (Color No. 4)                                      |
-// |                 45 | Set background color to Magenta. (Color No. 5)                                   |
-// |                 46 | Set background color to Cyan. (Color No. 6)                                      |
-// |                 47 | Set background color to White. (Color No. 7)                                     |
-// |--------------------+----------------------------------------------------------------------------------|
-// | 48 ; 2 ; r ; g ; b |                                                                                  |
-// | 48 ; 2 ; r : g : b |                                                                                  |
-// | 48 ; 2 : r : g : b |                                                                                  |
-// | 48 : 2 : r : g : b | Set background color in RGB value, matching closest entry in 256 colors palette. |
-// |--------------------+----------------------------------------------------------------------------------|
-// |        48 ; 5 ; Ps |                                                                                  |
-// |        48 ; 5 : Ps |                                                                                  |
-// |        48 : 5 : Ps | Set background color to color number Ps.                                         |
-// |--------------------+----------------------------------------------------------------------------------|
-// |                 49 | Set background color to default.                                                 |
-// |                 90 | Set foreground color to Gray. (Color No. 8)                                      |
-// |                 91 | Set foreground color to Bright Red. (Color No. 9)                                |
-// |                 92 | Set foreground color to Bright Green. (Color No. 10)                             |
-// |                 93 | Set foreground color to Bright Yellow. (Color No. 11)                            |
-// |                 94 | Set foreground color to Bright Blue. (Color No. 12)                              |
-// |                 95 | Set foreground color to Bright Magenta. (Color No. 13)                           |
-// |                 96 | Set foreground color to Bright Cyan. (Color No. 14)                              |
-// |                 97 | Set foreground color to Bright White. (Color No. 15)                             |
-// |                100 | Set background color to Gray. (Color No. 8)                                      |
-// |                101 | Set background color to Bright Red. (Color No. 9)                                |
-// |                102 | Set background color to Bright Green. (Color No. 10)                             |
-// |                103 | Set background color to Bright Yellow. (Color No. 11)                            |
-// |                104 | Set background color to Bright Blue. (Color No. 12)                              |
-// |                105 | Set background color to Bright Magenta. (Color No. 13)                           |
-// |                106 | Set background color to Bright Cyan. (Color No. 14)                              |
-// |                107 | Set background color to Bright White. (Color No. 15)                             |
-// |--------------------+----------------------------------------------------------------------------------|
 
 
 "use strict";
@@ -108,8 +115,8 @@ function main(){
 
     //data send to server
     term.on('data', function(data){
-	socket.send(JSON.stringify({msg: data, command: 'shell'}));
-	// socket.emit('data', data);
+	// socket.send(JSON.stringify({msg: data, command: 'shell'}));
+	socket.emit('data', data);
     });
     
     term.draw();
