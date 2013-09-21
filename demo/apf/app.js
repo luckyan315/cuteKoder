@@ -46,7 +46,7 @@ if ('development' == app.get('env')) {
 require('./server/routes');
 
 server.listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+  console.log('\x1b[1;37;42mExpress\x1b[m server listening on \x1b[1;32mport\x1b[m ' + app.get('port'));
 });
 
 /**

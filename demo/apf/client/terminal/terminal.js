@@ -3,6 +3,32 @@
  * Copyright (c) 2013, guanglin.an (lucky315.an@gmail.com)
  */
 
+/*
+ * REF:
+ *      http://en.wikipedia.org/wiki/ANSI_escape_code
+ *      http://en.wikipedia.org/wiki/C0_and_C1_control_codes
+ *      http://en.wikipedia.org/wiki/Control_Sequence_Introducer#Sequence_elements
+ *      http://ttssh2.sourceforge.jp/manual/en/about/ctrlseq.html#CSI
+ */
+
+/* Definitions
+ * |----+---------------------------------------------------|
+ * | c  | The literal character c.                          |
+ * |----+---------------------------------------------------|
+ * | C  | A single (required) character                     |
+ * |----+---------------------------------------------------|
+ * | Ps | A single (usually optional) numeric parameter,    |
+ * |    | composed of one of more digits.                   |
+ * |----+---------------------------------------------------|
+ * | Pm | A multiple numeric parameter composed of any      |
+ * |    | number of single numeric parameters, separated    |
+ * |    | by ; character(s). Individual values for the      |
+ * |    | parameters are listed with Ps.                    |
+ * |----+---------------------------------------------------|
+ * | Pt | A text parameter composed of printable characters |
+ * |----+---------------------------------------------------|
+ */
+
 /**
  *  Mode(Strandard)
  *
@@ -137,11 +163,11 @@ function Terminal(container, r, c){
     /* char content to be rendered */
     this.$rows = [];
     for(var i=0; i<this.$nRow; i++){
-	var r = []; //row
+	var row = []; //row
 	for(var j=0; j<this.$nCol; j++){
-	    r[j] = ' ';
+	    row[j] = [' ', Terminal.DEFAULT_SGR_ATTR];
 	}
-	this.$rows.push(r);
+	this.$rows.push(row);
     }
     
     /* line nums received from server */
@@ -156,6 +182,8 @@ function Terminal(container, r, c){
     /* save parameters as parsing csi sequence */
     this.$csiParams = [];
     this.$curParam = 0;
+
+    this.$curAttr = 0;
     
     this.$parse_state = Terminal.COMMON;
     
@@ -241,11 +269,6 @@ inherits(Terminal, EventEmitter);
 
 /**
  * state of ANSI escape code,
- *
- * REF:
- *      http://en.wikipedia.org/wiki/ANSI_escape_code
- *      http://en.wikipedia.org/wiki/C0_and_C1_control_codes
- *      http://en.wikipedia.org/wiki/Control_Sequence_Introducer#Sequence_elements
  */
 Terminal.COMMON = 0; //command charset
 Terminal.ESC = 1; //ESC
@@ -267,6 +290,18 @@ Terminal.OSC = 8; //ESC ],
 Terminal.ROW = 24;
 Terminal.COL = 80;
 
+//
+Terminal.DEFAULT_BACKGROUND_COLOR = 0;
+Terminal.DEFAULT_FOREGROUND_COLOR = 7;
+Terminal.DEFAULT_COMMON_TYPE = 0
+
+//dark color, background = black, foreground = white, font
+Terminal.DEFAULT_SGR_ATTR =
+    0 << 12 |
+    Terminal.DEFAULT_BACKGROUND_COLOR << 8 |
+    Terminal.DEFAULT_FOREGROUND_COLOR << 4 |
+    Terminal.DEFAULT_COMMON_TYPE;
+
 
 (function(){
 
@@ -276,7 +311,7 @@ Terminal.COL = 80;
     //public
     
     this.handleMessage = function(data){
-	console.log('[Terminal]' + data.replace(/\x1b/g, '^['));
+	console.log('[Terminal]' + data.replace(/\x1b/g, 'u001b'));
 
 	//init vars
 	var content = data;
@@ -294,16 +329,25 @@ Terminal.COL = 80;
 		case '\x1b':
 		    this.$parse_state = Terminal.ESC;
 		    break;
+		case '\t':
+		    //TODO: next tab pos
+		    break;
 		case '\n':
 		    r++;
 		    break;
 		case '\r':
-		    c = 0
+		    c = 0;
 		    break;
 		case '\b':
-		    c--;
+		    if(c>0){
+			c--;
+		    }
 		default:
-		    this.$rows[r][c] = ch;
+		    if( c >= this.$nCol ){
+			c = 0;
+			r++;
+		    }
+		    this.$rows[r][c] = [ch, this.$curAttr];
 		    c++;
 		};
 		break; /* Terminal.COMMON */
@@ -379,7 +423,7 @@ Terminal.COL = 80;
 		    break;
 		case ';':
 		    //TODO: csi ;
-                    this.$csiParams.push(this.$curParam);
+		    this.$csiParams.push(this.$curParam);
 		    this.$curParam = 0;
 		    break;
 		case 'A': 
@@ -451,23 +495,23 @@ Terminal.COL = 80;
 		    //Moves cursor to the right Ps columns.The default 1.
 		    break;
 		case 'c':
-                    // Primary Device Attribute. The default value of Ps is 0.
-                    // Ps = 0    Asks for the terminal's architectural class and basic attributes.
-                    // Response: Depends the Terminal ID setting.
-                    //   VT100     ESC [ ? 1 ; 2 c
-                    //   VT100J    ESC [ ? 5 ; 2 c
-                    //   VT101     ESC [ ? 1 ; 0 c
-                    //   VT102     ESC [ ? 6 c
-                    //   VT102J    ESC [ ? 15 c
-                    //   VT220J    ESC [ ? 62 ; 1 ; 2 ; 5 ; 6 ; 7 ; 8 c
-                    //   VT282     ESC [ ? 62 ; 1 ; 2 ; 4 ; 5 ; 6 ; 7 ; 8 ; 10 ; 11 c
-                    //   VT320     CSI ? 63 ; 1 ; 2 ; 6 ; 7 ; 8 c
-                    //   VT382     CSI ? 63 ; 1 ; 2 ; 4 ; 5 ; 6 ; 7 ; 8 ; 10 ; 15 c
-                    //   VT420     CSI ? 64 ; 1 ; 2 ; 7 ; 8 ; 9 ; 15 ; 18 ; 21 c"
-                    //   VT520     CSI ? 65 ; 1 ; 2 ; 7 ; 8 ; 9 ; 12 ; 18 ; 19 ; 21 ; 23 ; 24 ; 42 ; 44 ; 45 ; 46 c
-                    //   VT525     CSI ? 65 ; 1 ; 2 ; 7 ; 9 ; 12 ; 18 ; 19 ; 21 ; 22 ; 23 ; 24 ; 42 ; 44 ; 45 ; 46 c
+		    // Primary Device Attribute. The default value of Ps is 0.
+		    // Ps = 0    Asks for the terminal's architectural class and basic attributes.
+		    // Response: Depends the Terminal ID setting.
+		    //   VT100     ESC [ ? 1 ; 2 c
+		    //   VT100J    ESC [ ? 5 ; 2 c
+		    //   VT101     ESC [ ? 1 ; 0 c
+		    //   VT102     ESC [ ? 6 c
+		    //   VT102J    ESC [ ? 15 c
+		    //   VT220J    ESC [ ? 62 ; 1 ; 2 ; 5 ; 6 ; 7 ; 8 c
+		    //   VT282     ESC [ ? 62 ; 1 ; 2 ; 4 ; 5 ; 6 ; 7 ; 8 ; 10 ; 11 c
+		    //   VT320     CSI ? 63 ; 1 ; 2 ; 6 ; 7 ; 8 c
+		    //   VT382     CSI ? 63 ; 1 ; 2 ; 4 ; 5 ; 6 ; 7 ; 8 ; 10 ; 15 c
+		    //   VT420     CSI ? 64 ; 1 ; 2 ; 7 ; 8 ; 9 ; 15 ; 18 ; 21 c"
+		    //   VT520     CSI ? 65 ; 1 ; 2 ; 7 ; 8 ; 9 ; 12 ; 18 ; 19 ; 21 ; 23 ; 24 ; 42 ; 44 ; 45 ; 46 c
+		    //   VT525     CSI ? 65 ; 1 ; 2 ; 7 ; 9 ; 12 ; 18 ; 19 ; 21 ; 22 ; 23 ; 24 ; 42 ; 44 ; 45 ; 46 c
 		    
-		  break;
+		    break;
 		case 'd':
 		    //Move to the corresponding vertical position(line Ps) of the current column.
 		    //The default value is 1.
@@ -485,8 +529,8 @@ Terminal.COL = 80;
 		    
 		    break;
 		case 'h':
-// 		    //Sets mode
-
+ 		    //Sets mode, detail info go to file comment .
+		    
 		    break;
 		case 'i':
 		    //Priting mode
@@ -506,8 +550,105 @@ Terminal.COL = 80;
 		    //Resets mode
 		    break;
 		case 'm':
-		    //
+		    //SGR, Character Atrributes, see more info at REF
+		    this.$csiParams.push(this.$curParam);
+		    this.setCharAttr();
+		    this.clearCsiParams();
+		    this.$parse_state = Terminal.COMMON;
+		    
 		    break;
+		case 'n':
+		    //Reports device status
+		    //Ps = 5  Request the terminal's operation status report.
+		    //        Always return 'CSI 0 n' (Terminal).
+		    //  =  6  Request cursor position report.
+		    //        Response: CSI r; cR
+		    //         r     Line number
+		    //         c     Column number
+		    
+		    
+		    break;
+		case 'r':
+		    //Set top and bottom margins.
+		    //Ps1   Line number for the top margin.
+		    //      The default value is 1.
+		    //Ps2   Line number for the bottom margin.
+		    //      The default value is number of lines per screen.
+		    
+		    break;
+		case 's':
+		    //| CSI s        | Save cursor position. Same as DECSC.SCP  |
+		    //|              | only works when DECLRMM is reset.        |
+		    //|--------------+------------------------------------------|
+		    //| CSI Ps1;Ps2s | Set left and right margins. DECSLRM only |
+		    //|              | works when DECLRMM is set                |
+		    
+		    break;
+		case 't':
+		    //Window manipulation.
+		    //
+		    // Ps1 =  1    De-iconify window.
+		    //     =  2    Minimize window.
+		    //     =  3    Move window to [Ps2, Ps3].
+		    //     =  4    Resize window to height Ps2 pixels and width Ps3 pixels.
+		    //     =  5    Raise the window to the top of the stacking order.
+		    //     =  6    Lower the window to the bottom of the stacking order.
+		    //     =  7    Refresh window.
+		    //     =  8    Resize window to Ps2 lines and Ps3 columns.
+		    //     =  9    Change maximize state of window.
+		    //             Ps2 = 0    Restore maximized window.
+		    //                 = 1    Maximize window.
+		    //
+		    //     = 11    Reports window state.
+		    //             Response: CSI s t
+		    //               s = 1    Normal. (non-iconified)
+		    //                 = 2    Iconified.
+		    //
+		    //     = 13    Reports window position.
+		    //             Response: CSI 3 ; x ; y t
+		    //               x    X position of window.
+		    //               y    Y position of window.
+		    //
+		    //     = 14    Reports window size in pixels.
+		    //             Response: CSI 4 ; y ; x t
+		    //               y    Window height in pixels.
+		    //               x    Window width in pixels.
+		    //
+		    //     = 18    Reports terminal size in characters.
+		    //             Response: CSI 8 ; y ; x t
+		    //               y    Terminal height in characters. (Lines)
+		    //               x    Terminal width in characters. (Columns)
+		    //
+		    //     = 19    Reports root window size in characters.
+		    //             Response: CSI 9 ; y ; x t
+		    //               y    Root window height in characters.
+		    //               x    Root window width in characters.
+		    //
+		    //     = 20    Reports icon label.
+		    //             Response: OSC L title ST
+		    //               title    icon label. (window title)
+		    //
+		    //     = 21    Reports window title.
+		    //             Response: OSC l title ST
+		    //               title    Window title.
+		    //     = 22    Save window title on stack.
+		    //             Ps2 = 0, 1, 2    Save window title.
+		    //     = 23    Restore window title from stack.
+		    //             Ps2 = 0, 1, 2    Restore window title.
+
+		    break;
+		case 'u':
+		    //Restore cursor position. Same as DECRC.
+		    
+		    break;
+		case 'r':
+		    //if csiParam[0] == '<' && csiParam.length == 2 : Restore cursor position.Same as DECRC.
+		    
+		    break;
+		case 's':
+		    //if csiParam[0] == '<' && csiParam.length == 2 : Restore IME open state.
+		    
+		    break; 
 		}
 
 		break; /* Terminal.CSI */
@@ -542,6 +683,7 @@ Terminal.COL = 80;
 	    // this.$rows[this.$curline].innerHTML += ch;
 	}
 	
+	this.renderMatric();
     };
     
     this.draw = function(){
@@ -561,11 +703,129 @@ Terminal.COL = 80;
 	}
     };  
 
+    this.setCharAttr = function(){
+	console.log('[Parameters]:' + this.$csiParams);
+
+	var curAttr = 0;
+
+	if( this.$csiParams.length === 0 ){
+	    curAttr = Terminal.DEFAULT_SGR_ATTR;
+	} else {
+	    //0-3 bit
+	    var char_type = Terminal.DEFAULT_SGR_ATTR & 0xf;
+	    //4-7 bit
+	    var fg = Terminal.DEFAULT_SGR_ATTR >> 4 & 0xf;
+	    //8-11 bit
+	    var bg = Terminal.DEFAULT_SGR_ATTR >> 8 & 0xf;
+	    //12th bit
+	    var bright = Terminal.DEFAULT_SGR_ATTR >> 12 & 1;
+	    
+	    for(var i=0; i<this.$csiParams.length; i++){
+		var param = this.$csiParams[i];
+		if( param >=0 && param < 30 ){
+		    switch(param){
+		    case 0:
+			//Normal
+			char_type = 0;
+			break;
+		    case 1:
+			//Bold
+			char_type = 1;
+			break;
+		    case 4:
+			//Underlined
+			char_type = 2;
+			break;
+		    case 5:
+			//Blink
+			char_type = 3;
+			break;
+		    case 7:
+			//Inverse
+			char_type = 4;
+			break;
+		    case 22:
+			//Normal(heighter bold nor faint)
+			char_type = 5;
+			break;
+		    case 24:
+			//Not underlined
+			char_type = 6;
+			break;
+		    case 25:
+			//Steady(not blinking)
+			char_type = 7;
+			break;
+		    case 27:
+			//Positive (not inverse)
+			char_type = 8;
+			break;
+		    default:
+			console.log('[BrowserIDE][SGR]Unknown character attribute:' + param);
+			char_type = 0; //normal
+		    }
+		} else if(param >= 30 && param <= 39){
+		    if (param >= 30 && param <= 37){
+			//set foreground color
+			// curAttr = (param - 30) << 4 | curAttr;
+			fg = param - 30;
+		    } else if (param === 38){
+			//Set foreground color in RGB value, matching
+			//closet entry in 256 colors palette.
+			
+		    } else {
+			//param = 39, Set foreground color to default
+			
+		    }
+		} else if(param >= 40 && param <= 49){
+		    if( param >= 40 && param <= 47 ){
+			//set background color
+			// curAttr = (param - 40) << 8 | curAttr;
+			bg = param - 40;
+		    } else if(param === 48) {
+			//Set background color in RGB value,
+			//matching closet entry in 256 colors palette.
+			
+		    } else {
+			//param = 49, Set background color to default
+			
+		    }
+		} else if(param >= 90 && param <= 97){
+		    //Set Bright foreground color
+		    // curAttr = 1 << 12 | (param - 90) << 4 | curAttr;
+		    bright = 1;
+		    fg = param - 90;
+		    
+		} else if(param >= 100 && param <= 107){
+		    //Set Bright background color
+		    // curAttr = 1 << 12 | (param - 100) << 8 | curAttr;
+		    bright = 1;
+		    bg = param - 107;
+		}
+	    }
+
+          curAttr = bright << 12 | bg << 8 | fg << 4 | char_type;
+	}
+
+	
+
+	this.$curAttr = curAttr;
+    };
+
+    this.renderMatric = function(){
+	
+    };
+    
+    this.clearCsiParams = function(){
+	this.$curParam = 0;
+	this.$csiParams = [];
+    };
+    
     //send data to server
     this.send = function(data){
 	this.emit('data', data);
     };
-
+    
 }).call(Terminal.prototype);
 
 //EventEmitter , node.js style api
