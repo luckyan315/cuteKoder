@@ -1,0 +1,61 @@
+***  tag
+     1. Terminal impls
+     2. JSON.parse --> try catch
+     3. server load lang, ace , apf...
+     4. unity error handling (http status code)
+     5. template for ejs page
+     6. log system for tracing user's behaviour
+     7. recent active projects , make date format friendly
+     8. provide query style APIs 
+
+*** idea
+   1. voc floating box, easy way to get the voc
+   2. 
+
+* TODO Functions to impl
+   1. User,Project datebase management
+   2. file/dir watcher (vfs) 
+   3. jsDAV funcs 
+     - search file 
+     - replace file content 
+     - regexp support 
+   4. Impl simple virtual terminal
+   5. pty permission (ssh login by terminal)
+   6. _csrf checking via express
+
+
+* TODO Advice by client
+  1. webdav url may not need user id(nickname)
+  2. packaged apf_c9.js does not work in our env
+     
+  
+* TODO Test
+  1. pv test for cloud_ide
+  2. multi-client synchronization write/read
+  3. emit multi-req from client side.
+
+* TODO To be continue... things
+  1. clone pty.js to ~/code/github/pty
+  2. modify binding.gyp
+     - include_dirs --> /usr/local/include/node
+     - node-gyp configure
+     - node-gyp build
+     - node-v0.6.16 ./test.js  (see the result success!), but not in cur node(v0.10.13)
+  3. 
+
+
+* DONE Functions implemented
+  1. socket.io plugin system for server side
+  2. import pty.js
+  3. filter all request from client side.
+     - http : app.router (permission OK)
+     - webdav : davServer.exec (permission OK)
+     - websocket : socket.io (permission OK)
+
+  4. express http request hook the url --> jsdav server
+
+  5. file/workspace api change to using vfs api 
+
+  6. use ejs render client side dynamicly
+  7. Project database dao
+

@@ -1,16 +1,21 @@
-
+#!/usr/bin/env node
 /**
  * Module dependencies.
  */
 
-var express = require('express')
-  , http = require('http')
-  , path = require('path');
+var express = require('express');
+var http = require('http');
+var path = require('path');
 
 var config = require('./config');
-var middleware = require('./server/middleware');
 var app = exports.app = express();
 var util = require('util');
+var middleware = require('./server/middleware');
+
+var term = require('term.js');
+
+var server = exports.server = http.createServer(app);
+
 // all environments
 app.set('port', process.env.PORT || config.port || 3000);
 app.set('views', __dirname + '/views');
@@ -21,10 +26,13 @@ app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.cookieParser('BrowserIde'));
 app.use(express.session());
+app.use(term.middleware());
 app.use(middleware.ideProvider());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'client')));
+app.use(express.static(path.join(__dirname, 'client/lib')));
 app.use(express.static(path.join(__dirname, 'client/support/apf')));
+app.use(express.static(path.join(__dirname, 'client/support/demo')));
 
 // development only
 if ('development' == app.get('env')) {
@@ -37,16 +45,8 @@ if ('development' == app.get('env')) {
 
 require('./server/routes');
 
-exports.server = http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
-  util.puts(" \n\
-*****************************************************\n\
- .----.  .--.  .-.   .-. .----..-. .-..-. .-. .---.\n\
-{ {__   / {} \\ |  `.'  |{ {__  | { } ||  `| |/   __}\n\
-.-._} }/  /\   \\| |\\ /| |.-._} }| {_} || |\\  |\\  {_ }\n\
-`----' `-'  `-'`-' ` `-'`----' `-----'`-' `-' `---' \n\
-*****************************************************\n\
-           \"" + config.name + " version " + config.version + '\"' + '\n');
+server.listen(app.get('port'), function(){
+  console.log('\x1b[1;37;42mExpress\x1b[m server listening on \x1b[1;32mport\x1b[m ' + app.get('port'));
 });
 
 /**
