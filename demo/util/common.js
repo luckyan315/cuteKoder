@@ -1,3 +1,9 @@
+/** 
+ * bref: util functions
+ * date: Sat Dec 14 10:51:33 2013
+ * author: angl (lucky315.an@gmail.com)
+ */
+
 "use strict";
 
 var fs = require('fs');
