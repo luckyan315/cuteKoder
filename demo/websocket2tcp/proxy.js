@@ -30,8 +30,7 @@ var webServer = http.createServer(handleRequest);
 
 webServer.listen(source_addr_port, function(){
   log('Websocket2TCP Proxy listen on ' + source_addr_port);
-
-  wsServer = new WebSocketServer({server : webServer});
+  wsServer = new WebSocketServer({server : webServer, handleProtocols: selectProtocol});
   wsServer.on('connection', handleConnection);
 });
 
@@ -56,7 +55,7 @@ function handleRequest(req, res, next){
 /* handle websocket connection */
 function handleConnection(client){
   //TODO:
-  log('a new client is connected!');
+  log('a new client is connected! ', target_addr_port, target_addr);
   var remote = net.createConnection(target_addr_port, target_addr, function(){
     log('Remote TCP Server is connected!');
   });
@@ -70,9 +69,16 @@ function handleConnection(client){
     }
     
   });
+
+  remote.on('error', function(err){
+    log('[Remote connection error] ' + err);
+    remote.end();
+    client.close();
+  });
   
   remote.on('end', function(){
     log('Remote TCP Server disconnected!');
+    
   });
   
   client.on('message', function(msg){
@@ -102,9 +108,11 @@ function handleConnection(client){
  * utils funcs
  */
 
-function log(msg){
+function log(){
+  var prefix = '\x1b[32m[debug] \x1b[m ';
+  Array.prototype.unshift.call(arguments, prefix);
   return process.env.NODE_ENV === 'production'
-    ? null : console.log('\x1b[32m[debug] \x1b[m ' + msg);
+    ? null : console.log.apply(console, arguments);
 }
 
 function getPort(addr){
@@ -119,4 +127,13 @@ function http_error(res, status_code, msg){
   return;
 }
 
-
+function selectProtocol(protocols, callback){
+  if (protocols.indexOf('binary') >= 0) {
+    callback(true, 'binary');
+  } else if (protocols.indexOf('base64') >= 0) {
+    callback(true, 'base64');
+  } else {
+    log("Client must support 'binary' or 'base64' protocol");
+    callback(false);
+  }  
+}
