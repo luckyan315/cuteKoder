@@ -9,6 +9,7 @@
 var path = require('path');
 var url = require('url');
 var fs = require('fs');
+var net = require('net');
 var argv = require('optimist')
   .usage('Usage: $0 -s [source_addr] -t [target_addr] -p [static_dir]')
   .demand(['s','t']).argv;
@@ -28,7 +29,7 @@ var wsServer = null;
 var webServer = http.createServer(handleRequest);
 
 webServer.listen(source_addr_port, function(){
-  console.log('Websocket2TCP Proxy listen on ' + source_addr_port);
+  log('Websocket2TCP Proxy listen on ' + source_addr_port);
 
   wsServer = new WebSocketServer({server : webServer});
   wsServer.on('connection', handleConnection);
@@ -55,13 +56,48 @@ function handleRequest(req, res, next){
 /* handle websocket connection */
 function handleConnection(client){
   //TODO:
-  console.log('a new client is connected!');
+  log('a new client is connected!');
+
+  var remote = net.createConnection(target_addr_port, target_addr, function(){
+    log('Remote TCP Server is connected!');
+  });
+
+  remote.on('data', function(data){
+    log('[Remote --> Proxy] ' + data);
+    if (client.protocol === 'base64') {
+      client.send(new Buffer(data).toString('base64'));
+    } else {
+      client.send(data, {binary : true});
+    }
+    
+  });
+  
+  remote.on('end', function(){
+    log('Remote TCP Server disconnected!');
+  });
+  
+  client.on('message', function(msg){
+    //TODO:
+    log('[Client --> Proxy] ' + msg);
+    
+  });
+
+  client.on('close', function(){
+    //TODO:
+    
+    remote.end();
+  });
 }
 
 
 /**
  * utils funcs
  */
+
+function log(msg){
+  return process.env.NODE_ENV === 'production'
+    ? null : console.log('\x1b[32m[debug] \x1b[m ' + msg);
+}
 
 function getPort(addr){
   if (!addr) throw new Error('need to input addr!');
@@ -74,3 +110,5 @@ function http_error(res, status_code, msg){
   res.end(msg);
   return;
 }
+
+
