@@ -7,7 +7,7 @@ var server = net.createServer(function(socket){
     console.log('[Remote server recv]:', msg.toString());
 
     //inform client
-    socket.write('Remote Server recv msg Success!');
+    socket.write('Remote Server recv msg:' + msg.toString());
   });
 
   socket.on('end', function(){
