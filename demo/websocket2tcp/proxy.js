@@ -1,3 +1,11 @@
+/**
+ * a proxy server for pipe websocket to tcp
+ * Copyright (C) 2014 guanglin.an (lucky315.an@gmail.com)
+ * 
+ */
+
+"use strict";
+
 var path = require('path');
 var url = require('url');
 var fs = require('fs');
@@ -13,13 +21,20 @@ var static_path = path.join(__dirname, argv.p || './');
 var http = require('http');
 var ws = require('ws');
 var WebSocketServer = ws.Server;
+/* websocket server */
+var wsServer = null; 
 
-var server = http.createServer(handleRequest);
+/* create web server */
+var webServer = http.createServer(handleRequest);
 
-server.listen(source_addr_port, function(){
+webServer.listen(source_addr_port, function(){
   console.log('Websocket2TCP Proxy listen on ' + source_addr_port);
+
+  wsServer = new WebSocketServer({server : webServer});
+  wsServer.on('connection', handleConnection);
 });
 
+/* handle http request */
 function handleRequest(req, res, next){
   var filename = path.join(static_path, url.parse(req.url).pathname);
   fs.exists(filename, function(exists){
@@ -36,6 +51,17 @@ function handleRequest(req, res, next){
     });
   });
 };
+
+/* handle websocket connection */
+function handleConnection(client){
+  //TODO:
+  console.log('a new client is connected!');
+}
+
+
+/**
+ * utils funcs
+ */
 
 function getPort(addr){
   if (!addr) throw new Error('need to input addr!');
