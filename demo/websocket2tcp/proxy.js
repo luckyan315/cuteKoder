@@ -55,8 +55,8 @@ function handleRequest(req, res, next){
 /* handle websocket connection */
 function handleConnection(client){
   //TODO:
-  log('a new client is connected! ', target_addr_port, target_addr);
-  var remote = net.createConnection(target_addr_port, target_addr, function(){
+  log('a new client is connected! ', target_addr_port, getIp(target_addr));
+  var remote = net.createConnection(target_addr_port, getIp(target_addr), function(){
     log('Remote TCP Server is connected!');
   });
 
@@ -115,11 +115,18 @@ function log(){
     ? null : console.log.apply(console, arguments);
 }
 
-function getPort(addr){
-  if (!addr) throw new Error('need to input addr!');
+function getPort(uri){
+  if (!uri) throw new Error('need to input uri!');
 
-  return addr.split(':')[1];
+  return uri.split(':')[1];
 };
+
+function getIp(uri){
+  if (!uri) throw new Error('need to input uri!');
+
+  return uri.split(':')[0];
+};
+
 
 function http_error(res, status_code, msg){
   res.writeHead(status_code, {'content-type': 'text/plain'});
