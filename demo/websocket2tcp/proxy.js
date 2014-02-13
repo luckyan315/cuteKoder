@@ -57,7 +57,6 @@ function handleRequest(req, res, next){
 function handleConnection(client){
   //TODO:
   log('a new client is connected!');
-
   var remote = net.createConnection(target_addr_port, target_addr, function(){
     log('Remote TCP Server is connected!');
   });
@@ -79,12 +78,21 @@ function handleConnection(client){
   client.on('message', function(msg){
     //TODO:
     log('[Client --> Proxy] ' + msg);
-    
+    if (client.protocol === 'base64') {
+      remote.write(new Buffer(msg, 'base64'));
+    } else {
+      remote.write(msg, 'binary');
+    }
   });
 
-  client.on('close', function(){
+  client.on('close', function(status_code, reason){
     //TODO:
-    
+    log('Client disconnected! ' + '['+ status_code +'] ' + reason);
+    remote.end();
+  });
+
+  client.on('error', function(err){
+    log('[client connection occur error]: ' + err);
     remote.end();
   });
 }
