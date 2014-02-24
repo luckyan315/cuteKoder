@@ -9,7 +9,9 @@
 
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
+var http = require('http');
 
+var in_mids = require('./in_mids.js');
 
 var ReverseProxy = exports = module.exports = function(opt){
   EventEmitter.call(this);
@@ -25,16 +27,32 @@ util.inherits(ReverseProxy, EventEmitter);
   //public funcs
   this.createServer = function(){
     //TODO:
-    console.log('create server');
+    if (this.server) return this.server;
+
+    function proxy_cb(target){
+      var arrInMids = Object.keys(in_mids).map(function(func_name){
+        return in_mids[func_name];
+      })
+      
+      return function(req, res){
+        arrInMids.forEach(function(func){
+          func.call(this, req, res, target);
+        });
+      }
+    };
+    
+    this.server = http.createServer(proxy_cb(this.target));
   };
 
 
-  this.listen = function(){
+  this.listen = function(port, cb){
     //TODO:
-    console.log('listening...' + this.target);
+    this.server.listen(port, cb);
   };
   
+  //private funcs
+  this.onError = function(err){
+    //TODO:
+  };
   
 }).call(ReverseProxy.prototype);
-
-
