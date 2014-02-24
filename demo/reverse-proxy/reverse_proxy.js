@@ -16,8 +16,8 @@ var in_mids = require('./in_mids.js');
 var ReverseProxy = exports = module.exports = function(opt){
   EventEmitter.call(this);
 
-  /* target url */
-  this.target = opt.target;
+  /* options: target(url) */
+  this.options = opt;
   
 };
 
@@ -29,19 +29,19 @@ util.inherits(ReverseProxy, EventEmitter);
     //TODO:
     if (this.server) return this.server;
 
-    function proxy_cb(target){
+    function proxy_cb(opt){
       var arrInMids = Object.keys(in_mids).map(function(func_name){
         return in_mids[func_name];
       })
       
       return function(req, res){
         arrInMids.forEach(function(func){
-          func.call(this, req, res, target);
+          func.call(this, req, res, opt);
         });
       }
     };
     
-    this.server = http.createServer(proxy_cb(this.target));
+    this.server = http.createServer(proxy_cb(this.options));
   };
 
 

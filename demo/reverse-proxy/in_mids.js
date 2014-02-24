@@ -7,16 +7,58 @@
 
 "use strict";
 
+var http = require('http');
+var url = require('url');
+var util = require('util');
+
 var IncomingMiddlewares = exports = module.exports;
 
 [
-  function before(req, res, target){
-    console.log('[Before] middleware entered!' + target);
+  function before(req, res, opt){
+    console.log('[Before] middleware entered!' + opt.target);
+    //TODO:
+    
   },
 
-  function proxy(req, res, target){
-    console.log('[Proxy] middleware entered!');
+  function proxy(req, res, opt){
+    // console.log('[Proxy] middleware entered!');
+    var options = mkRequestOptions(req, opt);
+    
+    var proxyReq = http.request(options);
+
+    proxyReq.on('response', function(proxyRes){
+      //TODO:
+
+      proxyRes.pipe(res);
+    });
+
+    proxyReq.on('error', function(err){
+      //TODO:
+
+      throw err;
+    });
+
+    proxyReq.end();
   }
 ].forEach(function(middleware){
   IncomingMiddlewares[middleware.name] = middleware;
 });
+
+function mkRequestOptions(req, opt){
+  var options = {};
+  var oURL = url.parse(opt['target']);
+
+  ['host', 'socketPath'].forEach(function(e){
+    options[e] = oURL.host;
+  });
+
+  ['hostname', 'port'].forEach(function(e){
+    util._extend(options, oURL[e]);
+  });
+  
+  ['method', 'headers'].forEach(function(e){
+    util._extend(options, req[e]);
+  });
+
+  console.log('[Proxy Options]', options);
+}
