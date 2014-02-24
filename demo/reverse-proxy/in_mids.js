@@ -47,18 +47,17 @@ var IncomingMiddlewares = exports = module.exports;
 function mkRequestOptions(req, opt){
   var options = {};
   var oURL = url.parse(opt['target']);
-
-  ['host', 'socketPath'].forEach(function(e){
-    options[e] = oURL.host;
+  // console.log('[oURL]', oURL);
+  
+  ['hostname', 'host', 'socketPath'].forEach(function(e){
+    options[e] = oURL[e];
   });
 
-  ['hostname', 'port'].forEach(function(e){
-    util._extend(options, oURL[e]);
-  });
   
   ['method', 'headers'].forEach(function(e){
-    util._extend(options, req[e]);
+    options[e] = req[e];
   });
 
-  console.log('[Proxy Options]', options);
+  // console.log('[Proxy Options]', options);
+  return options;
 }
