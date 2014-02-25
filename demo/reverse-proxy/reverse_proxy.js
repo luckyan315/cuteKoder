@@ -55,7 +55,7 @@ util.inherits(ReverseProxy, EventEmitter);
   //private funcs
   this.onError = function(err){
     //TODO:
-    console.log('[ReverseProxy] onError cb called!');
+    console.log('[ReverseProxy] onError cb called! ', err);
   };
   
 }).call(ReverseProxy.prototype);

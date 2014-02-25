@@ -11,16 +11,18 @@ var http = require('http');
 var url = require('url');
 var util = require('util');
 
+var out_mids = require('./out_mids');
+
 var IncomingMiddlewares = exports = module.exports;
 
 [
-  function before(req, res, opt){
+  function beforeRequest(req, res, opt){
     console.log('[Before] middleware entered!' + opt.target);
     //TODO:
     
   },
 
-  function proxy(req, res, opt, proxy){
+  function wrapRequest(req, res, opt, proxy){
     // console.log('[Proxy] middleware entered!');
     var options = mkRequestOptions(req, opt);
     
@@ -28,7 +30,7 @@ var IncomingMiddlewares = exports = module.exports;
 
     proxyReq.on('response', function(proxyRes){
       //TODO:
-
+      
       proxyRes.pipe(res);
     });
 
