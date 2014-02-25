@@ -18,7 +18,9 @@ var ReverseProxy = exports = module.exports = function(opt){
 
   /* options: target(url) */
   this.options = opt;
-  
+
+  /* init listeners */
+  this.on('error', this.onError.bind(this));
 };
 
 util.inherits(ReverseProxy, EventEmitter);
@@ -28,7 +30,7 @@ util.inherits(ReverseProxy, EventEmitter);
   this.createServer = function(){
     //TODO:
     if (this.server) return this.server;
-
+    var _this = this;
     function proxy_cb(opt){
       var arrInMids = Object.keys(in_mids).map(function(func_name){
         return in_mids[func_name];
@@ -36,7 +38,7 @@ util.inherits(ReverseProxy, EventEmitter);
       
       return function(req, res){
         arrInMids.forEach(function(func){
-          func.call(this, req, res, opt);
+          func.call(this, req, res, opt, _this);
         });
       }
     };
@@ -53,6 +55,7 @@ util.inherits(ReverseProxy, EventEmitter);
   //private funcs
   this.onError = function(err){
     //TODO:
+    console.log('[ReverseProxy] onError cb called!');
   };
   
 }).call(ReverseProxy.prototype);

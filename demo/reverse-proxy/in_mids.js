@@ -20,7 +20,7 @@ var IncomingMiddlewares = exports = module.exports;
     
   },
 
-  function proxy(req, res, opt){
+  function proxy(req, res, opt, proxy){
     // console.log('[Proxy] middleware entered!');
     var options = mkRequestOptions(req, opt);
     
@@ -34,8 +34,7 @@ var IncomingMiddlewares = exports = module.exports;
 
     proxyReq.on('error', function(err){
       //TODO:
-
-      throw err;
+      proxy.emit('error', err);
     });
 
     proxyReq.end();
