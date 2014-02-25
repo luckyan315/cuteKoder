@@ -12,6 +12,7 @@ var util = require('util');
 var http = require('http');
 
 var in_mids = require('./in_mids.js');
+var logger = require('./logger.js');
 
 var ReverseProxy = exports = module.exports = function(opt){
   EventEmitter.call(this);
@@ -38,7 +39,7 @@ util.inherits(ReverseProxy, EventEmitter);
       
       return function(req, res){
         arrInMids.forEach(function(func){
-          func.call(this, req, res, opt, _this);
+          func.call(null, req, res, opt, _this);
         });
       }
     };
@@ -55,7 +56,7 @@ util.inherits(ReverseProxy, EventEmitter);
   //private funcs
   this.onError = function(err){
     //TODO:
-    console.log('[ReverseProxy] onError cb called! ', err);
+    logger.error('[ReverseProxy] onError cb called! ', err);
   };
   
 }).call(ReverseProxy.prototype);
