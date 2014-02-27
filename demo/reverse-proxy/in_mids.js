@@ -11,31 +11,41 @@ var http = require('http');
 var url = require('url');
 var util = require('util');
 
+var out_mids = require('./out_mids');
+var logger = require('./logger.js');
+
 var IncomingMiddlewares = exports = module.exports;
 
 [
-  function before(req, res, opt){
-    console.log('[Before] middleware entered!' + opt.target);
+  function beforeRequest(req, res, opt){
+    logger.debug('[in][BeforeRequest] middleware entered!' + opt.target);
     //TODO:
     
   },
 
-  function proxy(req, res, opt){
-    // console.log('[Proxy] middleware entered!');
+  function wrapRequest(req, res, opt, proxy){
+    logger.debug('[in][WrapRequest] middleware entered!');
+
+    var arrOutMids = Object.keys(out_mids).map(function(func_name){
+      return out_mids[func_name];
+    });
+
     var options = mkRequestOptions(req, opt);
-    
     var proxyReq = http.request(options);
 
     proxyReq.on('response', function(proxyRes){
       //TODO:
-
+      
+      arrOutMids.forEach(function(func){
+        func.call(null, proxyRes);
+      });
+      
       proxyRes.pipe(res);
     });
 
     proxyReq.on('error', function(err){
       //TODO:
-
-      throw err;
+      proxy.emit('error', err);
     });
 
     proxyReq.end();
@@ -46,10 +56,10 @@ var IncomingMiddlewares = exports = module.exports;
 
 function mkRequestOptions(req, opt){
   var options = {};
-  var oURL = url.parse(opt['target']);
-  // console.log('[oURL]', oURL);
+  var oURL = url.parse(opt.target);
+  logger.debug('[oURL]', oURL);
   
-  ['hostname', 'host', 'socketPath'].forEach(function(e){
+  ['hostname', 'host', 'socketPath', 'port'].forEach(function(e){
     options[e] = oURL[e];
   });
 
@@ -58,6 +68,11 @@ function mkRequestOptions(req, opt){
     options[e] = req[e];
   });
 
-  // console.log('[Proxy Options]', options);
+  options.path = url.parse(req.url).pathname;
+  
+  options.headers.host = options.host;
+  
+  logger.debug('[Options]', options);
+  
   return options;
 }
