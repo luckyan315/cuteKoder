@@ -1,4 +1,5 @@
 #define BUILDING_NODE_EXTENSION
+#include <iostream>
 #include "myobject.h"
 
 using namespace v8;
@@ -19,6 +20,7 @@ void MyObject::Init(Handle<Object> exports) {
 	Local<FunctionTemplate> tpl = FunctionTemplate::New(MyObject::New);
 
 	tpl->SetClassName(String::NewSymbol("MyObject"));
+	tpl->InstanceTemplate()->SetInternalFieldCount(1);
 	
 	//prototype
 	tpl->PrototypeTemplate()->Set(String::NewSymbol("plusOne"),
@@ -32,12 +34,14 @@ Handle<Value> MyObject::New(const Arguments& args) {
 	
 	if (args.IsConstructCall()) {
 		//invoked as constructor
-		double value = args[0]->isUndefined() ? 0 : args[0]->NumberValue();
+		std::cout<<"[ConstructCall]"<<std::endl;
+		double value = args[0]->IsUndefined() ? 0 : args[0]->NumberValue();
 		MyObject* pObj = new MyObject(value);
 		pObj->Wrap(args.This());
 		return args.This();
 	} else {
 		//invoked as plain function 'MyObject()', turn into construct call.
+		std::cout<<"[PlainFuncionCall]"<<std::endl;
 		const int argc  = 1;
 		Local<Value> argv[argc] = { args[0]};
 		return scope.Close(constructor->NewInstance(argc, argv));

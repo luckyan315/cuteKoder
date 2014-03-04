@@ -1,7 +1,7 @@
 {
     "targets" : [
 	{
-	    "target_name" : "objects",
+	    "target_name" : "addon",
 	    "sources" : ["addon.cc", "myobject.cc"]
 	}
     ]
