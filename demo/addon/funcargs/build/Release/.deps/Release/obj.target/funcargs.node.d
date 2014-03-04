@@ -1,0 +1,1 @@
+cmd_Release/obj.target/funcargs.node := flock ./Release/linker.lock g++ -shared -pthread -rdynamic -m32  -Wl,-soname=funcargs.node -o Release/obj.target/funcargs.node -Wl,--start-group Release/obj.target/funcargs/funcargs.o -Wl,--end-group 
