@@ -1,0 +1,1 @@
+cmd_Release/obj.target/factory.node := flock ./Release/linker.lock g++ -shared -pthread -rdynamic -m32  -Wl,-soname=factory.node -o Release/obj.target/factory.node -Wl,--start-group Release/obj.target/factory/factory.o -Wl,--end-group 
