@@ -24,20 +24,3 @@ void init(Handle<Object> exports) {
 }
 
 NODE_MODULE(funcargs, init)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
