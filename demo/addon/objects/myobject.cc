@@ -56,22 +56,3 @@ Handle<Value> MyObject::PlusOne(const Arguments& args) {
 
 	return scope.Close(Number::New(pObj->m_value));
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
