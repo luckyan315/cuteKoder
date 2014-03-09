@@ -51,9 +51,6 @@ getConfirm() {
     done
 }
 
-###############################################################################
-# main
-###############################################################################
 
 main_menu() {
     clear
@@ -76,9 +73,6 @@ echo -n "Please enter choice and enter return"
 read menu_choice
 return
 }
-
-#show main menu
-main_menu
 
 insert_title() {
     echo $* >> $title_file
@@ -119,11 +113,45 @@ add_record_tracks() {
 add_records() {
     #Prompt for the initial information
     echo -n "Enter catelog name"
-read tmp
-cdcatnum=${tmp%%,*}
+    read tmp
+    cdcatnum=${tmp%%,*}
+    
+    echo -n "Enter title"
+    read tmp
+    cdtitle=${tmp%%,*}
+
+    echo -n "Enter type"
+    read tmp
+    cdtype=${tmp%%,*}
+
+    echo -n "Enter artist"
+    read tmp
+    cdac=${tmp%%,*}
+
+    # Check that they want to enter the information
+    echo "About to add new entry"
+    echo "$cdcatnum $cdtitle $cdtype $cdac"
+
+    #if confirmed then append it to the titles file
+
+    if getConfirm ; then
+	insert_title $cdcatnum,$cdtitle,$cdtype,$cdac
+	add_record_tracks
+    else
+	remove_records
+    fi
+    
+    return
     
 }
 
+find_cd() {
+    echo "find_cd"
+}
+
+update_cd() {
+    echo "update_cd"
+}
 
 #parse args
 while getopts ":ht:" opt; do
@@ -141,3 +169,24 @@ while getopts ":ht:" opt; do
 	
     esac
 done
+
+
+###############################################################################
+# main
+###############################################################################
+
+quit=n
+while [ "$quit" != "y" ]; do
+    main_menu
+    case "$menu_choice" in
+	a) add_records;;
+	r) remove_records;;
+	f) find_cd;;
+	u) update_cd;;
+	q | Q) quit=y;;
+	*) echo -e "\x1b[31mUnknown Command\x1b[m" >&2
+    esac
+done
+
+echo "Quit App..."
+exit 0
