@@ -423,6 +423,15 @@ exports.getUserHome = function(username) {
 
 };
 
+exports.inherits = function(ctor, superCtor){
+  function f(){
+    this.constructor = ctor;
+  }
+
+  f.prototype = superCtor.prototype;
+  ctor.prototype = new f();
+};
+
 function doMakeHome(mk_home_cmd, callback) {
   exec(mk_home_cmd,
     function(error, stdout, stderr) {
@@ -468,3 +477,4 @@ function configUserEnv(user_path, callback) {
     })
   });
 };
+
