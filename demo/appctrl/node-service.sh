@@ -51,9 +51,15 @@ start() {
 
 }
 
-# stop() {
-    
-# }
+stop() {
+    pid=`get_pid`
+    if [ -z $pid ]; then
+	echo 'Node Service not running'
+    else
+	kill -15 $pid
+	echo 'Node Service stopped!'
+    fi
+}
 
 # restart() {
     
@@ -74,7 +80,7 @@ while getopts "hb:ert:" opt; do
 	    start
 	    ;;
 	e)
-	    echo "service stop...."
+	    stop
 	    ;;
 	r)
 	    echo "service restart..."
