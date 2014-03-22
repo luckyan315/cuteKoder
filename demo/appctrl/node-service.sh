@@ -61,9 +61,12 @@ stop() {
     fi
 }
 
-# restart() {
-    
-# }
+restart() {
+    stop
+    sleep 0.5
+    echo restarting....
+    start
+}
 
 if [ $# -lt 1 ]; then
     help
@@ -83,7 +86,7 @@ while getopts "hb:ert:" opt; do
 	    stop
 	    ;;
 	r)
-	    echo "service restart..."
+	    restart
 	    ;;
 	t)
 	    arg="$OPTARG"
