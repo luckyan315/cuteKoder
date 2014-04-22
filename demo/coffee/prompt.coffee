@@ -39,6 +39,7 @@ strToCoordinates = (input) ->
     console.log 'Input must be of follow the format ... \'x, y\''
 
 # First coffee app 
+console.log 'Welcome to game!'
 promptForTile1()
 
 
