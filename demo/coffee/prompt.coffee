@@ -22,6 +22,29 @@ Grid_Size = 5
 inRange = (x, y) ->
   0 <= x < Grid_Size and 0 <= y < Grid_Size
 
+isInteger = (num) -> num is Math.round(num)
+
+strToCoordinates = (input) ->
+  halves = input.split(',')
+  if halves.length is 2
+    x = parseFloat halves[0]
+    y = parseFloat halves[1]
+    if !isInteger(x) or !isInteger(y) or !inRange(x) or !inRange(y)
+      console.log 'Each coordinates must be a integer'
+    else if not inRange x - 1, y - 1
+      console.log 'Each coordinates must be between 1 and #{Grid_Size}.'
+    else
+      {x, y}
+  else
+    console.log 'Input must be of follow the format ... \'x, y\''
+
+# First coffee app 
+promptForTile1()
+
+
+
+
+
 
 
 
