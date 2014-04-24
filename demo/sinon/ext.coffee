@@ -9,4 +9,9 @@ util.inherits Ext, EventEmitter
 Ext::test = () ->
   console.log 'It is test print...'
 
+Ext::fakeSearch = (uuid, cb) ->
+  console.log 'Do some .....Fake Search DB.....'
+  @.realSearch uuid, cb
 
+Ext::realSearch = (uuid, cb) ->
+  console.log 'Do some ....Real Search DB'
