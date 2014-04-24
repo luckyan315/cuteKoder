@@ -1,3 +1,9 @@
+# /**
+#  * Prompt util func 
+#  * Copyright (C) 2014 guanglin.an (lucky315.an@gmail.com)
+#  * 
+#  */
+
 stdin = process.openStdin()
 stdin.setEncoding 'utf8'
 
@@ -41,11 +47,6 @@ strToCoordinates = (input) ->
 # First coffee app 
 console.log 'Welcome to game!'
 promptForTile1()
-
-
-
-
-
 
 
 
