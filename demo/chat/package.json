@@ -1,0 +1,15 @@
+{
+  "name": "imsvr",
+  "version": "0.0.1",
+  "description": "chatting room via socket.io.pre2",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "chat",
+    "socket.io"
+  ],
+  "author": "luckyan315",
+  "license": "MIT"
+}
