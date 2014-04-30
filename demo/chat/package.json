@@ -4,7 +4,18 @@
   "description": "chatting room via socket.io.pre2",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "make test"
+  },
+  "dependences" : {
+    "socket.io" : "1.0.0-pre2",
+    "socket.io-client" : "1.0.0-pre2",
+    "debug" : "*"
+  },
+  "devDependencies" : {
+    "mocha" : "1.16.2",
+    "should" : "3.3.1",
+    "supertest" : "0.8.2"
+
   },
   "keywords": [
     "chat",
