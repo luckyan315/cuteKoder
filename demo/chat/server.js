@@ -1,5 +1,5 @@
 /**
- * a proxy server for pipe websocket to tcp
+ * simple chatting room
  * Copyright (C) 2014 guanglin.an (lucky315.an@gmail.com)
  * 
  */
