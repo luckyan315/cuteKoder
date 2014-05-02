@@ -8,6 +8,7 @@
 	"start" : "DEBUG=* node server.js"
     },
     "dependencies" : {
+	"express" : "3.4.8",
 	"socket.io" : "1.0.0-pre2",
 	"socket.io-client" : "1.0.0-pre2",
 	"debug" : "*"
