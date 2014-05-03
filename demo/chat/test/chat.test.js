@@ -1,3 +1,10 @@
+/**
+ * TDD sample code for testing chat.js
+ * Copyright (C) 2014 guanglin.an (lucky315.an@gmail.com)
+ * 
+ */
+
+"use strict";
 
 var should = require('should');
 var request = require('supertest');
@@ -9,6 +16,7 @@ var chat = require('../chat.js');
 var app = chat.app;
 var io = chat.io;
 var httpServer = chat.httpServer;
+
 var config = require('../config');
 var host = config.test.host;
 var port = config.test.port;
