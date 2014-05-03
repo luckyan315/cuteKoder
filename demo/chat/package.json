@@ -2,10 +2,10 @@
     "name": "imsvr",
     "version": "0.0.1",
     "description": "chatting room via socket.io.pre2",
-    "main": "server.js",
+    "main": "chat.js",
     "scripts": {
 	"test" : "NODE_ENV=test DEBUG=Chat:*,socket.io:*,socket.io-client:* mocha -R spec test/*.test.js",
-	"start" : "NODE_ENV=development DEBUG=Chat:* node server.js"
+	"start" : "NODE_ENV=development DEBUG=Chat:* node chat.js"
     },
     "dependencies" : {
 	"express" : "3.4.8",
@@ -21,6 +21,7 @@
 
     },
     "keywords": [
+	"imsvr",
 	"chat",
 	"socket.io"
     ],

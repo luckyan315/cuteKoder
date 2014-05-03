@@ -5,7 +5,7 @@ var http = require('http');
 var ioc = require('socket.io-client');
 var debug = require('debug')('Chat:ServerTest');
 
-var chat = require('../server.js');
+var chat = require('../chat.js');
 var app = chat.app;
 var io = chat.io;
 var httpServer = chat.httpServer;
@@ -45,17 +45,19 @@ describe('Chat Server', function(){
     });
   });
   
-  it.only('should connect the server success', function(){
+  it('should connect the server success', function(done){
     var address = 'ws://' + host + ':' + port;
     debug('[address]: ' + address);
 
     var sockets = ioc(address);
     sockets.on('connect', function(client){
       debug('It is connected to server...');
+      done();
     });
 
     sockets.on('error', function(err){
       debug('[Error] ' , err);
+      done(err);
     });
   });
 
