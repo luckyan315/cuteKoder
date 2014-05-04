@@ -6,25 +6,25 @@
 
  "use strict";
 
-var express = require('express');
-var debug = require('debug')('Chat:app');
-var config = require('./config');
-var port = config.dev.port;
+ var express = require('express');
+ var debug = require('debug')('Chat:app');
+ var config = require('./config');
+ var port = config.dev.port;
 
-var jsmask = require('json-mask');
+ var jsmask = require('json-mask');
 
-var app = exports.app = express();
-var http = require('http');
-var httpServer = exports.httpServer = http.createServer(app);
-var io = exports.io = require('socket.io')(httpServer);
+ var app = exports.app = express();
+ var http = require('http');
+ var httpServer = exports.httpServer = http.createServer(app);
+ var io = exports.io = require('socket.io')(httpServer);
 
-app.use(express.static(__dirname + '/public'));
+ app.use(express.static(__dirname + '/public'));
 
-app.get('/', function(req, res){
+ app.get('/', function(req, res){
   res.send('Hello World');
 });
 
-if (process.env.NODE_ENV !== 'test') {
+ if (process.env.NODE_ENV !== 'test') {
   httpServer.listen(port, function(){
     debug('Chatting server is listening port on %d', port);
   });
@@ -39,8 +39,11 @@ io.use(function(socket, next){
   if(!handshakeData.uuid){
     handshakeData.uuid = 'wkrldi';
   }
-
   next();
+
+  // check cookie, as use express
+  // if (handshakeData.headers.cookie) return next();
+  // next(new Error('Authorization Error'));
 });
 
 io.on('connection', function(socket){
@@ -55,14 +58,21 @@ io.on('connection', function(socket){
 
 io.of('/user', function(socket){
   // todo: public user api
-  
+
   socket.on('add', function(){
     socket.emit('user_added');
+  });
+
+  //for testt
+  socket.on('sayall', function(data){
+    debug('[Chat][sayall] ', data);
+    // socket.broadcast.to('user').emit('new message', data);
+    io.sockets.emit('new_message', data);
   });
 });
 
 io.of('/private', function(socket){
-  debug(socket.nsp.name + ' --------a client is connected!');
+  debug(socket.nsp.name + ' a client is connected!');
   debug('[uuid] ', socket.request.uuid);
 
   //todo: private api

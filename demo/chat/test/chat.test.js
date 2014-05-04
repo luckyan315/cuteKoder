@@ -93,6 +93,34 @@ describe('Chat Server', function(){
       user_socket.emit('add');      
     })
   });
+
+  it.only('should sio namespace broadcast ok', function(done){
+    var user_socket = ioc(address + '/user');
+    var pri_socket = ioc(address + 'private');
+    var nRecvCnt = 0;
+    user_socket.on('new_message', function(data){
+      // if(nRecvCnt === 2){
+        done();
+      // }
+
+      if(data === 'hi') nRecvCnt++;
+      debug('[ioc] recv msg nRecvCnt: ' + nRecvCnt);
+    });
+
+    pri_socket.on('new_message', function(data){
+      // if(nRecvCnt === 2){
+        done();
+      // }
+  
+      if(data === 'hi') nRecvCnt++;      
+      debug('[ioc] recv msg nRecvCnt: ' + nRecvCnt);
+
+    });
+
+    user_socket.on('connect', function(){
+      user_socket.emit('sayall', 'hi');
+    });
+  });
 });
 
 
