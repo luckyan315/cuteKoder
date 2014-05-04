@@ -55,7 +55,7 @@ describe('Chat Server', function(){
     });
   });
   
-  it.only('should connect the server success', function(done){
+  it('should connect the server success', function(done){
     var sockets = ioc(address);
     sockets.on('connect', function(client){
       io.eio.clientsCount.should.eql(1);

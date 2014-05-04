@@ -33,7 +33,7 @@ if (process.env.NODE_ENV !== 'test') {
 io.use(function(socket, next){
   var field = 'headers(host),url,method,_query';
   var handshakeData = socket.request;
-  console.log(jsmask(handshakeData, field));
+  debug(jsmask(handshakeData, field));
 
   if (false) {
     return next(new Error('[hook] Not Auth'))
