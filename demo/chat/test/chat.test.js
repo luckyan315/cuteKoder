@@ -68,7 +68,7 @@ describe('Chat Server', function(){
     });
   });
 
-  it.only('should access /private ', function(done){
+  it('should access /private ', function(done){
     var pri_socket = ioc(address + '/private');
 
     pri_socket.on('connect', function(){
@@ -81,4 +81,20 @@ describe('Chat Server', function(){
       done(reason);
     });
   });
+
+  it('should do add action via /user namespace', function(done){
+    var user_socket = ioc(address + '/user');
+
+    user_socket.on('user_added', function(){
+      done();
+    });
+
+    user_socket.on('connect', function(){
+      user_socket.emit('add');      
+    })
+  });
 });
+
+
+
+

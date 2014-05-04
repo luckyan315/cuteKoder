@@ -53,9 +53,20 @@ io.on('connection', function(socket){
   });
 });
 
-io.of('/private').on('connection', function(socket){
-  debug(socket.nsp.name + ' a client is connected!');
+io.of('/user', function(socket){
+  // todo: public user api
+  
+  socket.on('add', function(){
+    socket.emit('user_added');
+  });
+});
+
+io.of('/private', function(socket){
+  debug(socket.nsp.name + ' --------a client is connected!');
   debug('[uuid] ', socket.request.uuid);
+
+  //todo: private api
+
 });
 
 io.on('error', function(err){
