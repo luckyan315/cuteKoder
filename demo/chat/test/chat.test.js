@@ -23,6 +23,8 @@ var port = config.test.port;
 
 describe('Chat Server', function(){
   var server = null;
+  var address = 'ws://' + host + ':' + port;
+  debug('[address]: ' + address);
   
   before(function(done){
     httpServer.listen(port, function(err, result){
@@ -54,12 +56,9 @@ describe('Chat Server', function(){
   });
   
   it.only('should connect the server success', function(done){
-    var address = 'ws://' + host + ':' + port;
-    debug('[address]: ' + address);
-
     var sockets = ioc(address);
     sockets.on('connect', function(client){
-      debug('It is connected to server...');
+      io.eio.clientsCount.should.eql(1);
       done();
     });
 
