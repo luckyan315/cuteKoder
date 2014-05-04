@@ -26,14 +26,13 @@ describe('Chat Server', function(){
   var address = 'ws://' + host + ':' + port;
   debug('[address]: ' + address);
   
-  before(function(done){
+  beforeEach(function(done){
     httpServer.listen(port, function(err, result){
       if (err) debug(err);
       done(err);
     });
-    
   });
-  
+          
   it('should got 200 status code when visit get /', function(done){
     request(app)
       .get('/')
@@ -96,23 +95,25 @@ describe('Chat Server', function(){
 
   it.only('should sio namespace broadcast ok', function(done){
     var user_socket = ioc(address + '/user');
-    var pri_socket = ioc(address + 'private');
+    var pri_socket = ioc(address + '/private');
     var nRecvCnt = 0;
     user_socket.on('new_message', function(data){
-      // if(nRecvCnt === 2){
-        done();
-      // }
-
       if(data === 'hi') nRecvCnt++;
+      
+      if(nRecvCnt === 2){
+        done();
+      }
+
       debug('[ioc] recv msg nRecvCnt: ' + nRecvCnt);
     });
 
     pri_socket.on('new_message', function(data){
-      // if(nRecvCnt === 2){
+      if(data === 'hi') nRecvCnt++;
+      
+      if(nRecvCnt === 2){
         done();
-      // }
-  
-      if(data === 'hi') nRecvCnt++;      
+      }
+
       debug('[ioc] recv msg nRecvCnt: ' + nRecvCnt);
 
     });
@@ -122,7 +123,3 @@ describe('Chat Server', function(){
     });
   });
 });
-
-
-
-

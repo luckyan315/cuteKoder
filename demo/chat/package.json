@@ -4,7 +4,7 @@
     "description": "chatting room via socket.io.pre2",
     "main": "chat.js",
     "scripts": {
-	"test" : "NODE_ENV=test DEBUG=Chat:*,socket.io:*,socket.io-client:*,socket.io-parser,engine mocha -R spec test/*.test.js",
+	"test" : "NODE_ENV=test DEBUG=Chat:*,socket.io:socket mocha -R spec test/*.test.js",
 	"start" : "NODE_ENV=development DEBUG=Chat:* node chat.js"
     },
     "dependencies" : {
@@ -20,7 +20,7 @@
 	"supertest" : "0.8.2",
 	"should" : "3.3.1",
   "json-mask" : "0.2.0"
-	
+		
     },
     "keywords": [
 	"imsvr",

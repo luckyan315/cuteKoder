@@ -18,9 +18,11 @@
  var httpServer = exports.httpServer = http.createServer(app);
  var io = exports.io = require('socket.io')(httpServer);
 
- app.use(express.static(__dirname + '/public'));
+var room = 'baywalk';
 
- app.get('/', function(req, res){
+app.use(express.static(__dirname + '/public'));
+
+app.get('/', function(req, res){
   res.send('Hello World');
 });
 
@@ -46,19 +48,21 @@ io.use(function(socket, next){
   // next(new Error('Authorization Error'));
 });
 
-io.on('connection', function(socket){
+io.on('connection', function(socket) {
   debug('New client is connected...');
-  var io_socket_field = 'rooms,id';
-  debug(JSON.stringify(jsmask(socket, io_socket_field)));
 
   socket.on('disconnect', function(){
     debug('A client disconnected...');
   });
 });
 
-io.of('/user', function(socket){
-  // todo: public user api
+io.of('/user').on('connection', function(socket){
+  socket.join(room);
 
+  var io_socket_field = 'rooms,id';
+  debug(JSON.stringify(jsmask(socket, io_socket_field)));
+  
+  // todo: public user api
   socket.on('add', function(){
     socket.emit('user_added');
   });
@@ -66,17 +70,23 @@ io.of('/user', function(socket){
   //for testt
   socket.on('sayall', function(data){
     debug('[Chat][sayall] ', data);
-    // socket.broadcast.to('user').emit('new message', data);
-    io.sockets.emit('new_message', data);
-  });
+
+    //broadcast via namespaces
+    io.of('/user').emit('new_message', data);
+    io.of('/private').emit('new_message', data);
+  });  
 });
 
-io.of('/private', function(socket){
+io.of('/private').on('connection', function(socket){
   debug(socket.nsp.name + ' a client is connected!');
   debug('[uuid] ', socket.request.uuid);
+  socket.join(room);
 
+  var io_socket_field = 'rooms,id';
+  debug(JSON.stringify(jsmask(socket, io_socket_field)));
+  
   //todo: private api
-
+  
 });
 
 io.on('error', function(err){
