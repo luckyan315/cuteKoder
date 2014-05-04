@@ -11,6 +11,8 @@ var debug = require('debug')('Chat:app');
 var config = require('./config');
 var port = config.dev.port;
 
+var jsmask = require('json-mask');
+
 var app = exports.app = express();
 var http = require('http');
 var httpServer = exports.httpServer = http.createServer(app);
@@ -27,6 +29,18 @@ if (process.env.NODE_ENV !== 'test') {
     debug('Chatting server is listening port on %d', port);
   });
 }
+
+io.use(function(socket, next){
+  var field = 'headers(host),url,method,_query';
+  var handshakeData = socket.request;
+  console.log(jsmask(handshakeData, field));
+
+  if (false) {
+    return next(new Error('[hook] Not Auth'))
+  }  
+  // do some authorization...
+  next();
+});
 
 io.on('connection', function(socket){
   debug('New client is connected...[socket id]:' + socket.id);
