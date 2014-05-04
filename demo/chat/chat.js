@@ -72,8 +72,9 @@ io.of('/user').on('connection', function(socket){
     debug('[Chat][sayall] ', data);
 
     //broadcast via namespaces
-    io.of('/user').emit('new_message', data);
-    io.of('/private').emit('new_message', data);
+    Object.keys(io.nsps).forEach(function(key){
+      io.of(key).emit('new_message', data);
+    });
   });  
 });
 
