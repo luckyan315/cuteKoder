@@ -68,4 +68,17 @@ describe('Chat Server', function(){
     });
   });
 
+  it.only('should access /private ', function(done){
+    var pri_socket = ioc(address + '/private');
+
+    pri_socket.on('connect', function(){
+      debug('successfully established a connection with the namespace');
+      done();
+    });
+
+    pri_socket.on('connect_failed', function(reason){
+      debug('Unable to connect the namespace ', reason);
+      done(reason);
+    });
+  });
 });

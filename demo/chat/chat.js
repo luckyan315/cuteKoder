@@ -31,23 +31,31 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 io.use(function(socket, next){
-  var field = 'headers(host),url,method,_query';
+  var socket_req_field = 'headers(host),url,method,_query';
   var handshakeData = socket.request;
-  debug(jsmask(handshakeData, field));
+  debug('Messages from HandshakeData:\n', jsmask(handshakeData, socket_req_field));
 
-  if (false) {
-    return next(new Error('[hook] Not Auth'))
-  }  
   // do some authorization...
+  if(!handshakeData.uuid){
+    handshakeData.uuid = 'wkrldi';
+  }
+
   next();
 });
 
 io.on('connection', function(socket){
-  debug('New client is connected...[socket id]:' + socket.id);
+  debug('New client is connected...');
+  var io_socket_field = 'rooms,id';
+  debug(JSON.stringify(jsmask(socket, io_socket_field)));
 
   socket.on('disconnect', function(){
     debug('A client disconnected...');
   });
+});
+
+io.of('/private').on('connection', function(socket){
+  debug(socket.nsp.name + ' a client is connected!');
+  debug('[uuid] ', socket.request.uuid);
 });
 
 io.on('error', function(err){
