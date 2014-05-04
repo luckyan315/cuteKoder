@@ -53,7 +53,7 @@ describe('Chat Server', function(){
     });
   });
   
-  it('should connect the server success', function(done){
+  it.only('should connect the server success', function(done){
     var address = 'ws://' + host + ':' + port;
     debug('[address]: ' + address);
 
