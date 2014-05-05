@@ -68,7 +68,7 @@ describe('Chat Server', function(){
   });
 
   it('should access /private ', function(done){
-    var pri_socket = ioc(address + '/private');
+    var pri_socket = ioc(address + '/private', { multiplex: false });
 
     pri_socket.on('connect', function(){
       debug('successfully established a connection with the namespace');
@@ -82,7 +82,7 @@ describe('Chat Server', function(){
   });
 
   it('should do add action via /user namespace', function(done){
-    var user_socket = ioc(address + '/user');
+    var user_socket = ioc(address + '/user', {multiplex: false});
 
     user_socket.on('user_added', function(){
       done();
@@ -93,33 +93,46 @@ describe('Chat Server', function(){
     })
   });
 
-  it.only('should sio namespace broadcast ok', function(done){
-    var user_socket = ioc(address + '/user');
-    var pri_socket = ioc(address + '/private');
+  it('should sio namespace broadcast ok', function(done){
+    var user_socket = ioc(address + '/user', { multiplex: false });
+    var pri_socket = ioc(address + '/private', { multiplex: false });
     var nRecvCnt = 0;
-    user_socket.on('new_message', function(data){
-      if(data === 'hi') nRecvCnt++;
-      
-      if(nRecvCnt === 2){
-        done();
-      }
+    var nConn = 0;
 
-      debug('[ioc] recv msg nRecvCnt: ' + nRecvCnt);
-    });
+    pri_socket.on('connect', function(){
+      nConn++;
 
-    pri_socket.on('new_message', function(data){
-      if(data === 'hi') nRecvCnt++;
-      
-      if(nRecvCnt === 2){
-        done();
-      }
+      pri_socket.on('new_message', function(data){
+        if(data === 'hi') nRecvCnt++;
+        debug('', '[ioc] recv msg nRecvCnt: ' + nRecvCnt);
 
-      debug('[ioc] recv msg nRecvCnt: ' + nRecvCnt);
+        if(nRecvCnt === 2){
+          done();
+        }
+      });
 
+      if(nConn === 2) user_ns_send();
     });
 
     user_socket.on('connect', function(){
-      user_socket.emit('sayall', 'hi');
+      nConn++;
+
+      user_socket.on('new_message', function(data){
+        if(data === 'hi') nRecvCnt++;
+        debug('', '[ioc] recv msg nRecvCnt: ' + nRecvCnt);
+
+        if(nRecvCnt === 2){
+          done();
+        }
+      });
+
+      if (nConn === 2) user_ns_send();
     });
+
+    function user_ns_send(){
+      debug('', 'client emit sayall hi');
+      user_socket.emit('sayall', 'hi');
+    };
+
   });
 });

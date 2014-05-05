@@ -69,7 +69,7 @@ io.of('/user').on('connection', function(socket){
 
   //for testt
   socket.on('sayall', function(data){
-    debug('[Chat][sayall] ', data);
+    debug('' , '[Chat][sayall] ' + data);
 
     //broadcast via namespaces
     Object.keys(io.nsps).forEach(function(key){
