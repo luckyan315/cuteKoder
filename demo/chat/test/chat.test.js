@@ -4,24 +4,24 @@
  * 
  */
 
-"use strict";
+ "use strict";
 
-var should = require('should');
-var request = require('supertest');
-var http = require('http');
-var ioc = require('socket.io-client');
-var debug = require('debug')('Chat:ServerTest');
+ var should = require('should');
+ var request = require('supertest');
+ var http = require('http');
+ var ioc = require('socket.io-client');
+ var debug = require('debug')('Chat:ServerTest');
 
-var chat = require('../chat.js');
-var app = chat.app;
-var io = chat.io;
-var httpServer = chat.httpServer;
+ var chat = require('../chat.js');
+ var app = chat.app;
+ var io = chat.io;
+ var httpServer = chat.httpServer;
 
-var config = require('../config');
-var host = config.test.host;
-var port = config.test.port;
+ var config = require('../config');
+ var host = config.test.host;
+ var port = config.test.port;
 
-describe('Chat Server', function(){
+ describe('Chat Server', function(){
   var server = null;
   var address = 'ws://' + host + ':' + port;
   debug('[address]: ' + address);
@@ -32,17 +32,17 @@ describe('Chat Server', function(){
       done(err);
     });
   });
-          
+  
   it('should got 200 status code when visit get /', function(done){
     request(app)
-      .get('/')
-      .expect(200, done);
+    .get('/')
+    .expect(200, done);
   });
 
   it('should work as a static server', function(done){
     request(app)
-      .get('/index.html')
-      .expect(200, done);
+    .get('/index.html')
+    .expect(200, done);
   });
 
   it('should "Not Found(404)"if there is not static file', function(done){
@@ -133,6 +133,7 @@ describe('Chat Server', function(){
       debug('', 'client emit sayall hi');
       user_socket.emit('sayall', 'hi');
     };
-
   });
+
+  
 });

@@ -16,13 +16,22 @@
  var app = exports.app = express();
  var http = require('http');
  var httpServer = exports.httpServer = http.createServer(app);
- var io = exports.io = require('socket.io')(httpServer);
 
-var room = 'baywalk';
+ var redis = require('redis');
+ var pub = redis.createClient();
+ var sub = redis.createClient(null, null, {detect_buffers: true});
+ var redisAdapter = require('socket.io-redis'); 
 
-app.use(express.static(__dirname + '/public'));
+ var redisClients = [];
+ var io = exports.io = 
+ require('socket.io')(httpServer, { adapter: redisAdapter({ pubClient: pub, subclient: sub }) });
+ redisClients.push(pub, sub);
 
-app.get('/', function(req, res){
+ var room = 'baywalk';
+
+ app.use(express.static(__dirname + '/public'));
+
+ app.get('/', function(req, res){
   res.send('Hello World');
 });
 
