@@ -1,0 +1,22 @@
+{
+    "name": "webrouter",
+    "version": "0.0.1",
+    "description": "middleware registration framework",
+    "main": "index.js",
+    "scripts": {
+	"test": "make test"
+    },
+    "dependencies": {
+	"connect" : "2.22.0",
+	"debug" : "0.8.1"
+    },
+    "devDependencies" : {
+	"mocha" : "1.16.2",
+	"should" : "3.3.1"
+    },      
+    "keywords": [
+	"webrouter"
+    ],
+    "author": "luckyan315",
+    "license": "MIT"
+}
