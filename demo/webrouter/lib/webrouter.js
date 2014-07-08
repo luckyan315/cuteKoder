@@ -9,5 +9,11 @@ var debug = require('debug')('webrouter:webrouter');
 exports = module.exports = createServer;
 
 function createServer(){
-   debug('create server...');
+  var router = function(){
+
+  };
+  
+  debug('webrouter constructor...');
+
+  return router;
 }
