@@ -4,16 +4,22 @@
  * Copyright (C) 2014 guanglin.an (lucky315.an@gmail.com)
  */
 
+var EventEmitter = require('events').EventEmitter;
+var inherits = require('util').inherits;
 var debug = require('debug')('webrouter:webrouter');
+
 
 exports = module.exports = createServer;
 
 function createServer(){
-  var router = function(){
-
+  function router(){
+    
   };
+
+  inherits(router, EventEmitter);
   
   debug('webrouter constructor...');
 
   return router;
 }
+

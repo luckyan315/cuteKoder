@@ -1,7 +1,7 @@
 var webrouter = require('..');
 var connect = require('connect');
 var should = require('should');
-var debug = require('debug')('webrouter:test');
+var debug = require('debug')('test:webrouter');
 
 describe('webrouter', function(){
   var router;
@@ -17,7 +17,11 @@ describe('webrouter', function(){
   });
 
   xit('should inherts event emitter', function(done){
-    
+    router.on('ping', function(){
+      done();
+    });
+
+    router.emit('ping');
   });
   
 });
