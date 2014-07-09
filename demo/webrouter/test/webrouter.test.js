@@ -16,7 +16,7 @@ describe('webrouter', function(){
     done();
   });
 
-  xit('should inherts event emitter', function(done){
+  it('should inherts event emitter', function(done){
     router.on('ping', function(){
       done();
     });

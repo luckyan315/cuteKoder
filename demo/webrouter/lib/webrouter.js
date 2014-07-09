@@ -6,8 +6,8 @@
 
 var EventEmitter = require('events').EventEmitter;
 var inherits = require('util').inherits;
+var merge = require('../common').merge;
 var debug = require('debug')('webrouter:webrouter');
-
 
 exports = module.exports = createServer;
 
@@ -16,7 +16,7 @@ function createServer(){
     
   };
 
-  inherits(router, EventEmitter);
+  merge(router, EventEmitter.prototype);
   
   debug('webrouter constructor...');
 
